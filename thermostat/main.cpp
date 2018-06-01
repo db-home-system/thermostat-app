@@ -1,12 +1,14 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <thermostat.h>
+#include <timeline.h>
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    qmlRegisterType<Thermostat>("com.thermostat", 1, 0, "Thermostat");
+    qmlRegisterType<Thermostat>("Thermostat", 1, 0, "Thermostat");
+    qmlRegisterType<Timeline>("Timeline", 1, 0, "Timeline");
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
