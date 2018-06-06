@@ -9,10 +9,6 @@ Window {
     height: 272
     title: qsTr("Hello World")
 
-    Thermostat {
-        id: temperatura;
-    }
-
     Item {
         anchors.fill: parent
         Image{
@@ -24,8 +20,14 @@ Window {
 
         Timeline {
             anchors.centerIn: parent
-            width: 200
-            height: 200
+            width: 270
+            height: 270
+        }
+
+        Text {
+            id: temperature
+            anchors.centerIn: parent
+            text : "30ªC"
         }
     }
 

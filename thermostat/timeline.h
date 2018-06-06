@@ -9,8 +9,9 @@ class Timeline : public QQuickPaintedItem
     Q_OBJECT
 public:
     explicit Timeline(QQuickItem *parent = nullptr);
+
+private:
     void paint(QPainter *painter);
-    void setClipRect(QPainter *painter);
 };
 
 #endif // TIMELINE_H
