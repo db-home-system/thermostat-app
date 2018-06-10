@@ -6,34 +6,61 @@
 #include <qmath.h>
 
 static int item[] = {
-            0, // 0
-            1, // 1
-            0, // 2
-            1, // 3
-            0, // 4
-            1, // 5
-            0, // 6
-            1, // 7
-            0, // 8
-            1, // 9
-            0, // 10
-            1, // 11
+    0, // 0
+    1, // 1
+    0, // 2
+    1, // 3
+    0, // 4
+    1, // 5
+    0, // 6
+    1, // 7
+    0, // 8
+    1, // 9
+    0, // 10
+    1, // 11
 
-            0, // 0
-            1, // 1
-            0, // 2
-            1, // 3
-            0, // 4
-            1, // 5
-            0, // 6
-            1, // 7
-            0, // 8
-            1, // 9
-            0, // 10
-            1, // 11
+    0, // 0
+    1, // 1
+    0, // 2
+    1, // 3
+    0, // 4
+    1, // 5
+    0, // 6
+    1, // 7
+    0, // 8
+    1, // 9
+    0, // 10
+    1, // 11
+};
 
-            0, // 11
-        };
+
+struct TimeLineLabel {
+    int hour;
+    int radius;
+};
+
+#define TIMELINE_LEN sizeof(hour)/sizeof(struct TimeLineLabel)
+struct TimeLineLabel hour[] = {
+    {0,  35},
+    {3,  30},
+    {6,  30},
+    {9,  30},
+    {12, 25},
+    {15, 30},
+    {18, 35},
+    {21, 35},
+    {24, 35}
+};
+
+#define LABEL_SPACE 65
+#define DIVISION_LINE_LABEL_LEN   15
+#define DIVISION_LINE_H_LEN       20
+#define START_ANGLE -60
+#define ANGLE 300
+#define LABEL_SIZE_OFF 7.5
+#define ROTATE_ANGLE 12.5
+#define TIMELINE_DIVISION 24
+#define TIMELINE_LABEL_FMT "%1"
 
 Timeline::Timeline(QQuickItem *parent) :
     QQuickPaintedItem(parent)
@@ -47,15 +74,44 @@ void Timeline::paint(QPainter *painter)
 
     const QRectF bounds = boundingRect();
 
+    QPen penMain("green");
+    QPen penMoon("blue");
     QPen penSun("red");
+
+    QPen timeLine("#8c8a7f");
+    QPen timeLineSteps("#800000");
+
+    penMain.setWidth(4);
+    penMain.setCapStyle(Qt::RoundCap);
+
+    penMoon.setWidth(8);
+    penMoon.setCapStyle(Qt::FlatCap);
+
     penSun.setWidth(8);
     penSun.setCapStyle(Qt::FlatCap);
 
-    qreal a = penSun.widthF() + 50;
-    QRectF rect = QRectF(a / 2.0 + 1, a / 2.0 + 1,
-                         bounds.width() - a - 2,
-                         bounds.height() - a - 2);
+    timeLineSteps.setWidth(3);
+    timeLineSteps.setCapStyle(Qt::RoundCap);
 
+    timeLine.setWidth(2);
+    timeLine.setCapStyle(Qt::RoundCap);
+
+    qreal sun_rect_margin = penSun.widthF() + LABEL_SPACE;
+    qreal main_rect_margin = sun_rect_margin + penMain.widthF() + penSun.widthF() + 1;
+    qreal moon_rect_margin = main_rect_margin + penMoon.widthF() + LABEL_SPACE;
+
+    qreal rtSun = sun_rect_margin / 2.0 + 1;
+    qreal rbSun = bounds.width() - sun_rect_margin - 2;
+    qreal rtMain = main_rect_margin / 2.0 + 1;
+    qreal rbMain = bounds.width() - main_rect_margin - 2;
+    qreal rtMoon = moon_rect_margin / 2.0 + 1;
+    qreal rbMoon = bounds.width() - moon_rect_margin - 2;
+
+    QLine division_label_line(0, rbMain/2, 0, rbMain/2 + DIVISION_LINE_LABEL_LEN);
+    QLine division_h_line(0, rbMain/2, 0, rbMain/2 + DIVISION_LINE_H_LEN);
+
+    // Main Rectangle
+    QRectF rect = QRectF(rtSun, rtSun, rbSun, rbSun);
     rect.moveCenter(bounds.center());
 
     // Make sure the arc is aligned to whole pixels.
@@ -68,42 +124,46 @@ void Timeline::paint(QPainter *painter)
     if (rect.height() - int(rect.height()) > 0)
         rect.setHeight(qFloor(rect.height()));
 
-
-    QPen penMain("green");
-    penMain.setWidth(4);
-    penMain.setCapStyle(Qt::RoundCap);
-
-    a = penMain.widthF() + penMain.widthF() + 9 + 50;
-    QRectF rectMain = QRectF(a / 2.0 + 1, a / 2.0 + 1,
-                         bounds.width() - a - 2,
-                         bounds.height() - a - 2);
-
+    QRectF rectMain = QRectF(rtMain, rtMain, rbMain, rbMain);
     rectMain.moveCenter(bounds.center());
 
-    QPen penMoon("blue");
-    penMoon.setWidth(8);
-    penMoon.setCapStyle(Qt::FlatCap);
-
-    a = penMoon.widthF() + penMain.widthF() +  penSun.widthF() + 9 + 50;
-    QRectF rectMoon = QRectF(a / 2.0 + 1, a / 2.0 + 1,
-                         bounds.width() - a - 2,
-                         bounds.height() - a - 2);
-
+    QRectF rectMoon = QRectF(rtMoon, rtMoon, rbMoon, rbMoon);
     rectMoon.moveCenter(bounds.center());
 
     painter->setRenderHint(QPainter::Antialiasing);
 
-    QPainterPath pathMoon, pathSun, pathMain;
-
-
-    painter->setPen(penMain);
-
     // Main circle
-    pathMain.arcMoveTo(rectMain, -60);
-    pathMain.arcTo(rectMain, -60, 300);
+    QPainterPath pathMain;
+    painter->setPen(penMain);
+    pathMain.arcMoveTo(rectMain, START_ANGLE);
+    pathMain.arcTo(rectMain, START_ANGLE, ANGLE);
     painter->fillPath(pathMain, QBrush("#CCFFCC00"));
     painter->drawPath(pathMain);
 
+    // Translate origin to compensate label size
+    painter->translate(bounds.center().x() - LABEL_SIZE_OFF, bounds.center().y());
+
+    for (size_t j = 0; j < TIMELINE_LEN; ++j) {
+        qreal px = (rbMain/2 + hour[j].radius) * std::sin(((-ROTATE_ANGLE*hour[j].hour+(START_ANGLE/2))*M_PI*2)/360);
+        qreal py = (rbMain/2 + hour[j].radius) * std::cos(((-ROTATE_ANGLE*hour[j].hour+(START_ANGLE/2))*M_PI*2)/360);
+        painter->drawText(QPoint(px,py), QString(TIMELINE_LABEL_FMT).arg(hour[j].hour));
+    }
+
+    painter->translate(LABEL_SIZE_OFF, 0);
+    painter->rotate(START_ANGLE/2);
+    for (int j = 0; j < TIMELINE_DIVISION + 1; ++j) {
+        if (!(j%3)) {
+            painter->setPen(timeLineSteps);
+            painter->drawLine(division_h_line);
+        } else{
+            painter->setPen(timeLine);
+            painter->drawLine(division_label_line);
+        }
+        painter->rotate(-ROTATE_ANGLE);
+    }
+
+
+// QPainterPath pathMoon, pathSun, pathMain;
 //    int startAngle = -60;
 //    qreal angle = 12.5;
 //    painter->setPen(penMoon);
@@ -131,57 +191,5 @@ void Timeline::paint(QPainter *painter)
 //        qDebug() << startAngle;
 //    }
 //    painter->drawPath(pathSun);
-
-
-
-
-    painter->translate(bounds.center().x() - 15, bounds.center().y());
-
-    struct TimeLineLabel {
-        int hour;
-        int radius;
-    };
-
-    struct TimeLineLabel hour[] = {
-        {0,120},
-        {3,125},
-        {6,120},
-        {9,120},
-        {12,110},
-        {15,120},
-        {18,120},
-        {21,125},
-        {24,120}
-    };
-#define TIMELINE_LEN sizeof(hour)/sizeof(struct TimeLineLabel)
-    qDebug() << TIMELINE_LEN;
-    for (size_t j = 0; j < TIMELINE_LEN; ++j) {
-        qreal px = hour[j].radius * std::sin(((-12.5*hour[j].hour-30)*M_PI*2)/360);
-        qreal py = hour[j].radius * std::cos(((-12.5*hour[j].hour-30)*M_PI*2)/360);
-        painter->drawText(QPoint(px,py), QString("%1:00").arg(hour[j].hour));
-    }
-
-
-    QPen ll("#8c8a7f");
-    ll.setWidth(2);
-    ll.setCapStyle(Qt::RoundCap);
-
-    QPen lh("#800000");
-    lh.setWidth(3);
-    lh.setCapStyle(Qt::RoundCap);
-
-    painter->translate(15, 0);
-    painter->rotate(-30);
-    //painter->drawLine(0,bounds.height() - 170,0,bounds.height() - 150);
-    for (int j = 0; j < 25; ++j) {
-        if (!(j%3)) {
-            painter->setPen(lh);
-            painter->drawLine(0,bounds.height() - 170,0,bounds.height() - 145);
-        } else{
-            painter->setPen(ll);
-            painter->drawLine(0,bounds.height() - 170,0,bounds.height() - 150);
-        }
-        painter->rotate(-12.5);
-    }
 }
 
