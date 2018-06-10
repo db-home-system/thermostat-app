@@ -32,7 +32,7 @@ static int item[] = {
     0, // 10
     1, // 11
 };
-
+#define ITEM_LEN sizeof(item)/sizeof(int)
 
 struct TimeLineLabel {
     int hour;
@@ -82,7 +82,7 @@ void Timeline::paint(QPainter *painter)
     QPen timeLineSteps("#800000");
 
     penMain.setWidth(4);
-    penMain.setCapStyle(Qt::RoundCap);
+    penMain.setCapStyle(Qt::FlatCap);
 
     penMoon.setWidth(8);
     penMoon.setCapStyle(Qt::FlatCap);
@@ -91,24 +91,24 @@ void Timeline::paint(QPainter *painter)
     penSun.setCapStyle(Qt::FlatCap);
 
     timeLineSteps.setWidth(3);
-    timeLineSteps.setCapStyle(Qt::RoundCap);
+    timeLineSteps.setCapStyle(Qt::FlatCap);
 
     timeLine.setWidth(2);
-    timeLine.setCapStyle(Qt::RoundCap);
+    timeLine.setCapStyle(Qt::FlatCap);
 
     qreal sun_rect_margin = penSun.widthF() + LABEL_SPACE;
     qreal main_rect_margin = sun_rect_margin + penMain.widthF() + penSun.widthF() + 1;
-    qreal moon_rect_margin = main_rect_margin + penMoon.widthF() + LABEL_SPACE;
+    qreal moon_rect_margin = main_rect_margin + penMoon.widthF() + penMain.widthF();
 
-    qreal rtSun = sun_rect_margin / 2.0 + 1;
-    qreal rbSun = bounds.width() - sun_rect_margin - 2;
-    qreal rtMain = main_rect_margin / 2.0 + 1;
-    qreal rbMain = bounds.width() - main_rect_margin - 2;
-    qreal rtMoon = moon_rect_margin / 2.0 + 1;
-    qreal rbMoon = bounds.width() - moon_rect_margin - 2;
+    qreal rtSun = sun_rect_margin / 2.0;
+    qreal rbSun = bounds.width() - sun_rect_margin;
+    qreal rtMain = main_rect_margin / 2.0;
+    qreal rbMain = bounds.width() - main_rect_margin;
+    qreal rtMoon = moon_rect_margin / 2.0;
+    qreal rbMoon = bounds.width() - moon_rect_margin;
 
-    QLine division_label_line(0, rbMain/2, 0, rbMain/2 + DIVISION_LINE_LABEL_LEN);
-    QLine division_h_line(0, rbMain/2, 0, rbMain/2 + DIVISION_LINE_H_LEN);
+    QLine division_label_line(0, rbMoon/2-penMain.widthF(), 0, rbMain/2 + DIVISION_LINE_LABEL_LEN);
+    QLine division_h_line(0, rbMoon/2-penMain.widthF(), 0, rbMain/2 + DIVISION_LINE_H_LEN);
 
     // Main Rectangle
     QRectF rect = QRectF(rtSun, rtSun, rbSun, rbSun);
@@ -129,15 +129,32 @@ void Timeline::paint(QPainter *painter)
 
     QRectF rectMoon = QRectF(rtMoon, rtMoon, rbMoon, rbMoon);
     rectMoon.moveCenter(bounds.center());
-
     painter->setRenderHint(QPainter::Antialiasing);
+
+    QPainterPath pathSun, pathMoon;
+    qreal startAngle = START_ANGLE;
+    qreal angle = ROTATE_ANGLE;
+    for (int j = 0; j < ITEM_LEN; ++j) {
+        startAngle = (angle * j) + START_ANGLE;
+        if (item[j]) {
+            pathSun.arcMoveTo(rect, startAngle);
+            pathSun.arcTo(rect, startAngle, angle);
+        } else {
+            pathMoon.arcMoveTo(rectMoon, startAngle);
+            pathMoon.arcTo(rectMoon, startAngle, angle);
+        }
+    }
+    painter->setPen(penSun);
+    painter->drawPath(pathSun);
+    painter->setPen(penMoon);
+    painter->drawPath(pathMoon);
 
     // Main circle
     QPainterPath pathMain;
     painter->setPen(penMain);
     pathMain.arcMoveTo(rectMain, START_ANGLE);
     pathMain.arcTo(rectMain, START_ANGLE, ANGLE);
-    painter->fillPath(pathMain, QBrush("#CCFFCC00"));
+    //painter->fillPath(pathMain, QBrush("#CCFFCC00"));
     painter->drawPath(pathMain);
 
     // Translate origin to compensate label size
@@ -161,35 +178,5 @@ void Timeline::paint(QPainter *painter)
         }
         painter->rotate(-ROTATE_ANGLE);
     }
-
-
-// QPainterPath pathMoon, pathSun, pathMain;
-//    int startAngle = -60;
-//    qreal angle = 12.5;
-//    painter->setPen(penMoon);
-//    for (int i = 0; i <= 25; i++){
-//        pathMoon.arcMoveTo(rectMoon, startAngle);
-//        if (item[i]) {
-//            pathMoon.arcTo(rectMoon, startAngle, angle);
-//            startAngle = (angle* i) - 60;
-//        } else {
-//            startAngle = (angle * i) - 60;
-//        }
-//    }
-
-//    painter->drawPath(pathMoon);
-
-//    startAngle = -60;
-//    angle = 25;
-//    painter->setPen(penSun);
-//    for (int i = 0; i <= 12; i++){
-//        pathSun.arcMoveTo(rect, startAngle);
-//        if (item[i]) {
-//            pathSun.arcTo(rect, startAngle, angle);
-//        }
-//        startAngle = (angle * i) - 60;
-//        qDebug() << startAngle;
-//    }
-//    painter->drawPath(pathSun);
 }
 
