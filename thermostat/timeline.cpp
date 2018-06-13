@@ -1,38 +1,8 @@
 #include "timeline.h"
 
-
 #include <QPainter>
 #include <QQuickItem>
 #include <qmath.h>
-
-static int item[] = {
-    0, // 0
-    1, // 1
-    0, // 2
-    1, // 3
-    0, // 4
-    1, // 5
-    0, // 6
-    1, // 7
-    0, // 8
-    1, // 9
-    0, // 10
-    1, // 11
-
-    0, // 0
-    1, // 1
-    0, // 2
-    1, // 3
-    0, // 4
-    1, // 5
-    0, // 6
-    1, // 7
-    0, // 8
-    1, // 9
-    0, // 10
-    1, // 11
-};
-#define ITEM_LEN sizeof(item)/sizeof(int)
 
 struct TimeLineLabel {
     int hour;
@@ -59,12 +29,38 @@ struct TimeLineLabel hour[] = {
 #define ANGLE 300
 #define LABEL_SIZE_OFF 7.5
 #define ROTATE_ANGLE 12.5
-#define TIMELINE_DIVISION 24
-#define TIMELINE_LABEL_FMT "%1"
 
 Timeline::Timeline(QQuickItem *parent) :
     QQuickPaintedItem(parent)
 {
+    bool flag = 0;
+    for (int j = 0; j < TIMELINE_DIVISION; ++j) {
+        timeline_slots[j].status = flag;
+        flag = !flag;
+     }
+}
+
+//void Timeline::setTimelineSlots(int index, int status)
+//{
+//    if (timeline_slots[index].status == status)
+//        return;
+
+//    timeline_slots[index].status = status;
+//    update();
+//    emit timelineSlotsChanged(index, status);
+//}
+
+int Timeline::getTimelineSlots() const
+{
+//    if (index < TIMELINE_DIVISION)
+//        return -1;
+
+    return 0;
+}
+
+void Timeline::setParm(int index, int status)
+{
+
 }
 
 void Timeline::paint(QPainter *painter)
@@ -131,12 +127,18 @@ void Timeline::paint(QPainter *painter)
     rectMoon.moveCenter(bounds.center());
     painter->setRenderHint(QPainter::Antialiasing);
 
+    // Put background to timeline.
+    QPainterPath fillmain;
+    fillmain.arcMoveTo(rectMain, -60);
+    fillmain.arcTo(rectMain, -60, 300);
+    painter->fillPath(fillmain, QBrush("#00ff33"));
+
     QPainterPath pathSun, pathMoon;
     qreal startAngle = START_ANGLE;
     qreal angle = ROTATE_ANGLE;
-    for (int j = 0; j < ITEM_LEN; ++j) {
+    for (int j = 0; j < TIMELINE_DIVISION; ++j) {
         startAngle = (angle * j) + START_ANGLE;
-        if (item[j]) {
+        if (timeline_slots[j].status) {
             pathSun.arcMoveTo(rect, startAngle);
             pathSun.arcTo(rect, startAngle, angle);
         } else {

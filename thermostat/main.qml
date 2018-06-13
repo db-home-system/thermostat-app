@@ -7,7 +7,7 @@ Window {
     visible: true
     width: 480
     height: 272
-    title: qsTr("Hello World")
+    title: qsTr("DB Home System")
 
     Item {
         anchors.fill: parent
@@ -19,15 +19,16 @@ Window {
         }
 
         Timeline {
+            id: timeline
             anchors.centerIn: parent
             width: 270
             height: 270
         }
 
         Text {
-            id: temperature
             anchors.centerIn: parent
-            text : "30ªC"
+            font.pointSize: 24
+            text : "<b>30ºC</b>"
         }
     }
 
