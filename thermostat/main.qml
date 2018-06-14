@@ -9,6 +9,10 @@ Window {
     height: 272
     title: qsTr("DB Home System")
 
+    Manager {
+        id: manager
+    }
+
     Item {
         anchors.fill: parent
         Image{
@@ -23,6 +27,7 @@ Window {
             anchors.centerIn: parent
             width: 270
             height: 270
+
         }
 
         Text {

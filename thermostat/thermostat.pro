@@ -15,7 +15,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
     thermostat.cpp \
-    timeline.cpp
+    timeline.cpp \
+    manager.cpp
 
 RESOURCES += qml.qrc
 
@@ -32,4 +33,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     thermostat.h \
-    timeline.h
+    timeline.h \
+    manager.h

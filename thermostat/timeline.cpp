@@ -38,29 +38,9 @@ Timeline::Timeline(QQuickItem *parent) :
         timeline_slots[j].status = flag;
         flag = !flag;
      }
-}
 
-//void Timeline::setTimelineSlots(int index, int status)
-//{
-//    if (timeline_slots[index].status == status)
-//        return;
-
-//    timeline_slots[index].status = status;
-//    update();
-//    emit timelineSlotsChanged(index, status);
-//}
-
-int Timeline::getTimelineSlots() const
-{
-//    if (index < TIMELINE_DIVISION)
-//        return -1;
-
-    return 0;
-}
-
-void Timeline::setParm(int index, int status)
-{
-
+    manager = Manager::instance();
+    connect(manger, &Manager::segnale, this, &Timeline::slot);
 }
 
 void Timeline::paint(QPainter *painter)
@@ -122,6 +102,8 @@ void Timeline::paint(QPainter *painter)
 
     QRectF rectMain = QRectF(rtMain, rtMain, rbMain, rbMain);
     rectMain.moveCenter(bounds.center());
+
+    //painter->translate(0, 20);
 
     QRectF rectMoon = QRectF(rtMoon, rtMoon, rbMoon, rbMoon);
     rectMoon.moveCenter(bounds.center());

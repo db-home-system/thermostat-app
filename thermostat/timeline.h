@@ -14,17 +14,8 @@ class Timeline : public QQuickPaintedItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(int timelineSlots READ getTimelineSlots NOTIFY timelineSlotsChanged)
-
 public:
     explicit Timeline(QQuickItem *parent = nullptr);
-    int getTimelineSlots() const;
-    //void setTimelineSlots(int index, int status);
-
-public slots:
-    void setParm(int index, int status);
-signals:
-    void timelineSlotsChanged(int index, int status);
 
 private:
     void paint(QPainter *painter);
