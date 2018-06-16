@@ -21,8 +21,11 @@ public:
 
 signals:
     void temperatureChanged(int temp);
+    void timelineChanged(QVector<int> *s);
 
 public slots:
+    void test(QString s);
+
 };
 
 #endif // MANAGER_H

@@ -1,4 +1,5 @@
 #include "timeline.h"
+#include "manager.h"
 
 #include <QPainter>
 #include <QQuickItem>
@@ -33,11 +34,9 @@ struct TimeLineLabel hour[] = {
 Timeline::Timeline(QQuickItem *parent) :
     QQuickPaintedItem(parent)
 {
-    bool flag = 0;
-    for (int j = 0; j < TIMELINE_DIVISION; ++j) {
-        timeline_slots[j].status = flag;
-        flag = !flag;
-     }
+    Manager *mgr = Manager::instance();
+    connect(mgr, SIGNAL(timelineChanged(QVector<int>*)),
+            this, SLOT(updateTimeline(QVector<int>*)));
 }
 
 void Timeline::paint(QPainter *painter)
@@ -115,9 +114,9 @@ void Timeline::paint(QPainter *painter)
     QPainterPath pathSun, pathMoon;
     qreal startAngle = START_ANGLE;
     qreal angle = ROTATE_ANGLE;
-    for (int j = 0; j < TIMELINE_DIVISION; ++j) {
+    for (int j = 0; j < time_slots.size(); ++j) {
         startAngle = (angle * j) + START_ANGLE;
-        if (timeline_slots[j].status) {
+        if (time_slots[j]) {
             pathSun.arcMoveTo(rect, startAngle);
             pathSun.arcTo(rect, startAngle, angle);
         } else {
@@ -159,5 +158,13 @@ void Timeline::paint(QPainter *painter)
         }
         painter->rotate(-ROTATE_ANGLE);
     }
+}
+
+void Timeline::updateTimeline(QVector<int> *p)
+{
+    time_slots.resize(p->size());
+    for (int i = 0; i < p->size(); i++)
+        time_slots[i] = p->at(i);
+    update();
 }
 

@@ -9,10 +9,17 @@ class Thermostat : public QObject
 
 public:
     explicit Thermostat(QObject *parent = nullptr);
-signals:
 
+public slots:
+    void timelineSlots();
+    void settingsChanged(QString cfg);
+
+signals:
+    void settingChanged(QVector<int> *timeline);
 
 private:
+    bool loadTimelineCfg(QString cfg);
+
 };
 
 #endif // THERMOSTAT_H
