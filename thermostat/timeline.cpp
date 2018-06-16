@@ -38,9 +38,6 @@ Timeline::Timeline(QQuickItem *parent) :
         timeline_slots[j].status = flag;
         flag = !flag;
      }
-
-    manager = Manager::instance();
-    connect(manger, &Manager::segnale, this, &Timeline::slot);
 }
 
 void Timeline::paint(QPainter *painter)

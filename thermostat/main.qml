@@ -1,7 +1,6 @@
 import QtQuick 2.4
 import QtQuick.Window 2.2
-import Thermostat 1.0
-import Timeline 1.0
+import ThermostatApp 1.0
 
 Window {
     visible: true
@@ -9,8 +8,9 @@ Window {
     height: 272
     title: qsTr("DB Home System")
 
-    Manager {
+    Item {
         id: manager
+        property string temperature: Manager.temperature
     }
 
     Item {
@@ -33,7 +33,7 @@ Window {
         Text {
             anchors.centerIn: parent
             font.pointSize: 24
-            text : "<b>30ºC</b>"
+            text : "<b>"+ manager.temperature+"</b>"
         }
     }
 
