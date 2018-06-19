@@ -12,6 +12,7 @@ class Manager : public QObject
 
 private:
     explicit Manager(QObject *parent = nullptr);
+    Thermostat * const thermostat;
 
 public:
     static Manager *instance(QObject *parent = nullptr);

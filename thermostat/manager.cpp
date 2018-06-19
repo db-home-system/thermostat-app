@@ -22,9 +22,9 @@ void Manager::test(QString s)
     qDebug() << "test slot" << s;
 }
 
-Manager::Manager(QObject *parent) : QObject(parent)
+Manager::Manager(QObject *parent) : QObject(parent),
+  thermostat(new Thermostat(this))
 {
-    Thermostat *thermostat = new Thermostat();
-    connect(thermostat, SIGNAL(settingChanged(QVector<int>*)),
-                    this, SIGNAL(timelineChanged(QVector<int>*)));
+    connect(thermostat, &Thermostat::settingChanged,
+                    this, &Manager::timelineChanged);
 }

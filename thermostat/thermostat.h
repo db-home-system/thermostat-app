@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+class QFileSystemWatcher;
+
 class Thermostat : public QObject
 {
     Q_OBJECT
@@ -19,6 +21,9 @@ signals:
 
 private:
     bool loadTimelineCfg(QString cfg);
+
+
+    QFileSystemWatcher * const _watcher;
 
 };
 

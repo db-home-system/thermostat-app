@@ -7,25 +7,25 @@
 
 #include <QtDebug>
 
-Thermostat::Thermostat(QObject *parent) : QObject(parent)
+Thermostat::Thermostat(QObject *parent) : QObject(parent),
+    _watcher(new QFileSystemWatcher(this))
 {
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(timelineSlots()));
     timer->start(1000);
-
-    // Watch configuration file
-    QFileSystemWatcher watcher;
 
     QString watch_path = "/etc/therapp/timeline.cfg";
     QByteArray settings_path = qgetenv("THERAPP_TIMELINE");
     if (!settings_path.isEmpty())
         watch_path = QString::fromLocal8Bit(settings_path);
 
-    watcher.addPath(watch_path);
-    qDebug() << watcher.files();
+    // add root path to watch all files.
+    qDebug() << watch_path;
+    _watcher->addPath(watch_path);
+    qDebug() << _watcher->files();
 
-    connect(&watcher, SIGNAL(fileChanged(QString)),
-                      this, SLOT(settingsChanged(QString)));
+    connect(_watcher, &QFileSystemWatcher::fileChanged,
+                      this, &Thermostat::settingsChanged);
 
     loadTimelineCfg(watch_path);
 }
@@ -46,12 +46,15 @@ bool Thermostat::loadTimelineCfg(QString cfg)
         return false;
     }
 
-    QStringList wordList;
+    QList<QStringList> wordList;
     while (!file.atEnd()) {
         QByteArray line = file.readLine();
-        wordList.append(line.split(';').first());
+        line = line.trimmed();
+        QString lline = QString::fromLocal8Bit(line);
+        wordList.append(lline.split(';'));
     }
     qDebug() << wordList;
+    file.close();
 
     return true;
 }
