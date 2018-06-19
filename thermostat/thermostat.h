@@ -2,6 +2,7 @@
 #define THERMOSTAT_H
 
 #include <QObject>
+#include <QVector>
 
 class QFileSystemWatcher;
 
@@ -20,10 +21,11 @@ signals:
     void settingChanged(QVector<int> *timeline);
 
 private:
-    bool loadTimelineCfg(QString cfg);
+    bool loadTimelineCfg(QString cfg, QList<QStringList> *l);
 
 
     QFileSystemWatcher * const _watcher;
+    QVector<int> timeline_slots;
 
 };
 
