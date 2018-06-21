@@ -5,12 +5,21 @@
 #include <QFile>
 #include <QTimer>
 #include <QFileSystemWatcher>
+#include <QTime>
+#include <QTimer>
 
 Manager *Manager::instance(QObject *parent)
 {
     static Manager *manager_instance = new Manager(parent);
 
     return manager_instance;
+}
+
+QString Manager::time() const
+{
+    QTime timeclock = QTime::currentTime();
+    QString text = timeclock.toString("hh:mm:ss");
+    return text;
 }
 
 QString Manager::intTemperature() const
@@ -21,6 +30,11 @@ QString Manager::intTemperature() const
 QString Manager::extTemperature() const
 {
     return QString::number(thermostat->extTemp(), 'f', 1);
+}
+
+void Manager::test(QString s)
+{
+
 }
 
 int Manager::thermostatStatus() const
@@ -42,6 +56,11 @@ void Manager::test()
 Manager::Manager(QObject *parent) : QObject(parent),
   thermostat(new Thermostat(this))
 {
+    timer = new QTimer(this);
+    timer->setInterval(1000);
+    timer->start();
+    connect(timer, &QTimer::timeout, this, &Manager::timeChanged);
+
     connect(thermostat, &Thermostat::dataChanged,
                     this, &Manager::timelineChanged);
 

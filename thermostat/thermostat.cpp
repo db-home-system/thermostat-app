@@ -27,7 +27,6 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
         timeline_slots[i].tempSP = 15.0;
     }
 
-
     // Register timer for pid controll
     QTimer *pid = new QTimer(this);
     connect(pid, &QTimer::timeout, this, &Thermostat::pidControll);

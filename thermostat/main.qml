@@ -13,6 +13,7 @@ Window {
         property string intTemperature: Manager.intTemperature
         property double extTemperature: Manager.extTemperature
         property string thermostatStatus: Manager.thermostatStatus
+        property string time: Manager.time
     }
 
     Item {
@@ -49,8 +50,17 @@ Window {
             id: thermostat
             anchors.centerIn: parent
             font.pointSize: 17
-            text: manager.thermostatStatus
             anchors.verticalCenterOffset: 32
+            anchors.horizontalCenterOffset: 0
+            text: manager.thermostatStatus
+        }
+
+        Text {
+            id: clock
+            anchors.centerIn: parent
+            font.pointSize: 17
+            text: manager.time
+            anchors.verticalCenterOffset: 39
             anchors.horizontalCenterOffset: 0
             color: 'grey'
             opacity: 0.7

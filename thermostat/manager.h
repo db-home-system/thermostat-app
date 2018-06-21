@@ -3,6 +3,7 @@
 
 #include <QObject>
 
+class QTimer;
 class Thermostat;
 struct TimelineSlotsData {
     int  onOff;
@@ -16,9 +17,11 @@ class Manager : public QObject
     Q_PROPERTY(QString intTemperature READ intTemperature NOTIFY intTemperatureChanged)
     Q_PROPERTY(QString extTemperature READ extTemperature NOTIFY extTemperatureChanged)
     Q_PROPERTY(int thermostatStatus READ thermostatStatus NOTIFY thermostatStatusChanged)
+    Q_PROPERTY(QString time READ time NOTIFY timeChanged)
 
 private:
     explicit Manager(QObject *parent = nullptr);
+    QTimer * timer;
     Thermostat * const thermostat;
 
     int _current_h;
@@ -31,7 +34,11 @@ public:
     QString extTemperature() const;
     int thermostatStatus() const;
 
+    QString time() const;
+
 signals:
+    void timeChanged();
+
     // Timeline signals
     void timelineChanged(QVector<TimelineSlotsData> *s);
     void currentHour(int h);
