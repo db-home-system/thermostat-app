@@ -1,17 +1,18 @@
 #include "manager.h"
 #include "thermostat.h"
-
+#include "weather.h"
 #include <QtDebug>
 #include <QFile>
 #include <QTimer>
 #include <QFileSystemWatcher>
 #include <QTime>
 #include <QTimer>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 Manager *Manager::instance(QObject *parent)
 {
     static Manager *manager_instance = new Manager(parent);
-
     return manager_instance;
 }
 
@@ -19,6 +20,7 @@ QString Manager::time() const
 {
     QTime timeclock = QTime::currentTime();
     QString text = timeclock.toString("hh:mm:ss");
+    qDebug() << text;
     return text;
 }
 
@@ -52,13 +54,20 @@ void Manager::test()
     emit currentHour(_current_h);
 }
 
+QString Manager::tempo() const
+{
+    return "everything works";
+}
+
 
 Manager::Manager(QObject *parent) : QObject(parent),
-  thermostat(new Thermostat(this))
+  thermostat(new Thermostat(this)), weather(new Weather(this))
 {
     timer = new QTimer(this);
     timer->setInterval(1000);
     timer->start();
+
+
     connect(timer, &QTimer::timeout, this, &Manager::timeChanged);
 
     connect(thermostat, &Thermostat::dataChanged,
@@ -79,4 +88,7 @@ Manager::Manager(QObject *parent) : QObject(parent),
     tt->start(300);
 
     _current_h = 0;
+
+    connect(weather, &Weather::weatherChanged, this, &Manager::weatherTrigger);
+
 }

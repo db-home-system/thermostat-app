@@ -16,7 +16,8 @@ SOURCES += \
         main.cpp \
     thermostat.cpp \
     timeline.cpp \
-    manager.cpp
+    manager.cpp \
+    weather.cpp
 
 RESOURCES += qml.qrc
 
@@ -35,4 +36,5 @@ HEADERS += \
     thermostat.h \
     timeline.h \
     manager.h \
-    app-config.h
+    app-config.h \
+    weather.h
