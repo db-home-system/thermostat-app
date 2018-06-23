@@ -114,16 +114,17 @@ void Timeline::paint(QPainter *painter)
     painter->fillPath(fillmain, QBrush("#00ff33"));
 
     QPainterPath pathSun, pathMoon;
-    qreal startAngle = START_ANGLE;
+    qreal startAngle = 240; //START_ANGLE;
     qreal angle = ROTATE_ANGLE;
     for (int j = 0; j < time_slots.size(); ++j) {
-        startAngle = (angle * j) + START_ANGLE;
+        startAngle = 240 - (angle * j);
+
         if (time_slots[j].onOff) {
             pathSun.arcMoveTo(rect, startAngle);
-            pathSun.arcTo(rect, startAngle, angle);
+            pathSun.arcTo(rect, startAngle, -1 * angle);
         } else {
             pathMoon.arcMoveTo(rectMoon, startAngle);
-            pathMoon.arcTo(rectMoon, startAngle, angle);
+            pathMoon.arcTo(rectMoon, startAngle,-1 * angle);
         }
     }
     painter->setPen(penSun);
