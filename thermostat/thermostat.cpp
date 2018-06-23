@@ -41,14 +41,15 @@ void Thermostat::settingsChanged(QString cfg)
                 continue;
             }
 
-            int h = sett[row][0].toInt();
-            if (h > 24) {
+            bool *check = NULL;
+            int h = sett[row][0].toInt(check);
+            if ((h > 24) && !(*check)) {
                 qDebug() << "Invalid hour." << h;
                 continue;
             }
 
-            int on_off = sett[row][1].toInt();
-            if (on_off != 0 && on_off != 1) {
+            int on_off = sett[row][1].toInt(check);
+            if (on_off != 0 && on_off != 1 && !(*check)) {
                 qDebug() << "Invalid on off value shoul be 0 or 1" << on_off;
                 continue;
             }
