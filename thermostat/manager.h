@@ -4,6 +4,11 @@
 #include <QObject>
 
 class Thermostat;
+struct TimelineSlotsData {
+    int  onOff;
+    float tempSP;
+};
+
 
 class Manager : public QObject
 {
@@ -22,7 +27,7 @@ public:
 
 signals:
     void temperatureChanged(int temp);
-    void timelineChanged(QVector<int> *s);
+    void timelineChanged(QVector<TimelineSlotsData> *s);
 
 public slots:
     void test(QString s);

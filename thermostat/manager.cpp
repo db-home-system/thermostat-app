@@ -25,6 +25,6 @@ void Manager::test(QString s)
 Manager::Manager(QObject *parent) : QObject(parent),
   thermostat(new Thermostat(this))
 {
-    connect(thermostat, &Thermostat::settingChanged,
+    connect(thermostat, &Thermostat::dataChanged,
                     this, &Manager::timelineChanged);
 }

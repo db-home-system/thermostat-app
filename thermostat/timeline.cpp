@@ -1,6 +1,6 @@
+#include "app-config.h"
 #include "timeline.h"
 #include "manager.h"
-#include "app-config.h"
 
 #include <QPainter>
 #include <QQuickItem>
@@ -37,8 +37,8 @@ Timeline::Timeline(QQuickItem *parent) :
     QQuickPaintedItem(parent)
 {
     Manager *mgr = Manager::instance();
-    connect(mgr, SIGNAL(timelineChanged(QVector<int>*)),
-            this, SLOT(updateTimeline(QVector<int>*)));
+    connect(mgr, &Manager::timelineChanged,
+            this, &Timeline::updateTimeline);
 }
 
 void Timeline::paint(QPainter *painter)
@@ -118,7 +118,7 @@ void Timeline::paint(QPainter *painter)
     qreal angle = ROTATE_ANGLE;
     for (int j = 0; j < time_slots.size(); ++j) {
         startAngle = (angle * j) + START_ANGLE;
-        if (time_slots[j]) {
+        if (time_slots[j].onOff) {
             pathSun.arcMoveTo(rect, startAngle);
             pathSun.arcTo(rect, startAngle, angle);
         } else {
@@ -162,11 +162,11 @@ void Timeline::paint(QPainter *painter)
     }
 }
 
-void Timeline::updateTimeline(QVector<int> *p)
+void Timeline::updateTimeline(QVector<TimelineSlotsData> *p)
 {
     time_slots.resize(p->size());
     for (int i = 0; i < p->size(); i++)
-        time_slots[i] = p->at(i);
+        time_slots[i].onOff = p->at(i).onOff;
     update();
 }
 

@@ -1,6 +1,8 @@
 #ifndef THERMOSTAT_H
 #define THERMOSTAT_H
 
+#include "manager.h"
+
 #include <QObject>
 #include <QVector>
 
@@ -14,17 +16,29 @@ public:
     explicit Thermostat(QObject *parent = nullptr);
 
 public slots:
-    void fileSettingsChanged(QString cfg);
-    void dirSettingsChanged(QString cfg);
+    void fileSettingsChanged();
+    void dirSettingsChanged();
 
 signals:
-    void settingChanged(QVector<int> *timeline);
+    void dataChanged(QVector<TimelineSlotsData> *timeline);
 
 private:
+    void pidControll();
+
     bool loadTimelineCfg(QString cfg, QList<QStringList> &l);
 
+    float readDeviceTemperature();
+    float readSensorTemperature();
+    float readSensorExtTemperature();
+
     QFileSystemWatcher * const _watcher;
-    QVector<int> timeline_slots;
+    QString _root_path;
+    QString _settings_path;
+
+
+    QVector<TimelineSlotsData> timeline_slots;
+
+    int current_hour;
 };
 
 #endif // THERMOSTAT_H
