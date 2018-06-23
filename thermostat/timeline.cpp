@@ -1,5 +1,6 @@
 #include "timeline.h"
 #include "manager.h"
+#include "app-config.h"
 
 #include <QPainter>
 #include <QQuickItem>
@@ -23,6 +24,7 @@ struct TimeLineLabel hour[] = {
     {24, 35}
 };
 
+#define TIMELINE_LABEL_FMT "%1"
 #define LABEL_SPACE 65
 #define DIVISION_LINE_LABEL_LEN   15
 #define DIVISION_LINE_H_LEN       20

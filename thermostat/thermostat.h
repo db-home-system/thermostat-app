@@ -14,19 +14,17 @@ public:
     explicit Thermostat(QObject *parent = nullptr);
 
 public slots:
-    void timelineSlots();
-    void settingsChanged(QString cfg);
+    void fileSettingsChanged(QString cfg);
+    void dirSettingsChanged(QString cfg);
 
 signals:
     void settingChanged(QVector<int> *timeline);
 
 private:
-    bool loadTimelineCfg(QString cfg, QList<QStringList> *l);
-
+    bool loadTimelineCfg(QString cfg, QList<QStringList> &l);
 
     QFileSystemWatcher * const _watcher;
     QVector<int> timeline_slots;
-
 };
 
 #endif // THERMOSTAT_H

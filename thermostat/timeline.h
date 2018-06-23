@@ -5,8 +5,6 @@
 #include <QColor>
 #include <QVector>
 
-#define TIMELINE_DIVISION 24
-#define TIMELINE_LABEL_FMT "%1"
 
 class Timeline : public QQuickPaintedItem
 {

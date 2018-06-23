@@ -34,4 +34,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     thermostat.h \
     timeline.h \
-    manager.h
+    manager.h \
+    app-config.h

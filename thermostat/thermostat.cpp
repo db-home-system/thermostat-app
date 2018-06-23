@@ -1,4 +1,5 @@
 #include "thermostat.h"
+#include "app-config.h"
 
 #include <QVector>
 #include <QTimer>
@@ -11,28 +12,45 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
     _watcher(new QFileSystemWatcher(this))
 {
 
-    QString watch_path = "/etc/therapp/timeline.cfg";
-    QByteArray settings_path = qgetenv("THERAPP_TIMELINE");
-    if (!settings_path.isEmpty())
-        watch_path = QString::fromLocal8Bit(settings_path);
-
-    // add root path to watch all files.
-    qDebug() << watch_path;
-    _watcher->addPath(watch_path);
-    qDebug() << _watcher->files();
-
     connect(_watcher, &QFileSystemWatcher::fileChanged,
-                      this, &Thermostat::settingsChanged);
+                      this, &Thermostat::fileSettingsChanged);
+    connect(_watcher, &QFileSystemWatcher::directoryChanged,
+                      this, &Thermostat::dirSettingsChanged);
+
+    dirSettingsChanged("");
+    // Set correct size for timelines slots.
+    timeline_slots.resize(TIMELINE_DIVISION);
 }
 
-void Thermostat::settingsChanged(QString cfg)
+void Thermostat::dirSettingsChanged(QString cfg)
 {
-    qDebug() << "file..";
-    qDebug() << cfg;
+    (void)cfg;
 
-    timeline_slots.resize(24);
+    // root path for all settings
+    QString root_path = APP_SETTINGS_ROOT;
+    QByteArray qroot_path = qgetenv(APP_SETTINGS_ROOT_ENV);
+    if (!qroot_path.isEmpty())
+        root_path = QString::fromLocal8Bit(qroot_path);
+
+    QString settings_path = root_path + TIMELINE_CFG;
+    QByteArray qsettings_path = qgetenv(TIMELINE_CFG_ENV);
+    if (!qsettings_path.isEmpty())
+        settings_path = QString::fromLocal8Bit(qsettings_path);
+
+    qDebug() << root_path << settings_path;
+
+    _watcher->addPath(root_path);
+    _watcher->addPath(settings_path);
+    qDebug() << _watcher->files() << _watcher->directories();
+
+}
+
+void Thermostat::fileSettingsChanged(QString cfg)
+{
+    qDebug() << "Read from: " << cfg;
+
     QList<QStringList> sett;
-    if (loadTimelineCfg(cfg, &sett))
+    if (loadTimelineCfg(cfg, sett))
     {
         for (int row = 0; row < sett.size(); row++)
         {
@@ -60,7 +78,7 @@ void Thermostat::settingsChanged(QString cfg)
     }
 }
 
-bool Thermostat::loadTimelineCfg(QString cfg, QList<QStringList> *l)
+bool Thermostat::loadTimelineCfg(QString cfg, QList<QStringList> &l)
 {
     QFile file(cfg);
     if (!file.open(QIODevice::ReadOnly)) {
@@ -72,21 +90,10 @@ bool Thermostat::loadTimelineCfg(QString cfg, QList<QStringList> *l)
         QByteArray line = file.readLine();
         line = line.trimmed();
         QString lline = QString::fromLocal8Bit(line);
-        l->append(lline.split(';'));
+        l.append(lline.split(';'));
         qDebug() << lline;
     }
     file.close();
 
     return true;
-}
-
-void Thermostat::timelineSlots()
-{
-//    QVector<int> timeline_slots(24, 0);
-//    int flag = 0;
-//    for (int j = 0; j < timeline_slots.size(); ++j) {
-//        timeline_slots[j] = flag;
-//        flag = !flag;
-//    }
-//    emit settingChanged(&timeline_slots);
 }
