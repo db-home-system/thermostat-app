@@ -29,7 +29,7 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
 
 
     // Register timer for pid controll
-    QTimer *pid = new QTimer();
+    QTimer *pid = new QTimer(this);
     connect(pid, &QTimer::timeout, this, &Thermostat::pidControll);
     pid->start(1000);
 
@@ -107,9 +107,25 @@ void Thermostat::pidControll()
     float sp = timeline_slots[current_hour].tempSP;
     qDebug() << "pid " << sp;
 
-    qDebug() << "dev " << readDeviceTemperature();
-    qDebug() << "sen " << readSensorTemperature();
-    qDebug() << "ext " << readSensorExtTemperature();
+    float temp_dev  =  readDeviceTemperature();
+    float temp_sens =  readSensorTemperature();
+    float temp_ext  =  readSensorExtTemperature();
+
+    float processed_temp = 0.0;
+
+    qDebug() << "dev: " << temp_dev << "sen: " << temp_sens << "ext: " << temp_ext;
+
+    bool onoff = false;
+    if (processed_temp < sp)
+        onoff = true;
+
+    heaterOnOff(onoff);
+
+}
+
+void Thermostat::heaterOnOff(bool cmd)
+{
+    qDebug() << "Heater " << cmd;
 }
 
 bool Thermostat::loadTimelineCfg(QString cfg, QList<QStringList> &l)

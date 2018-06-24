@@ -31,6 +31,8 @@ private:
     float readSensorTemperature();
     float readSensorExtTemperature();
 
+    void heaterOnOff(bool cmd);
+
     QFileSystemWatcher * const _watcher;
     QString _root_path;
     QString _settings_path;
