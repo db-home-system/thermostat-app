@@ -3,6 +3,7 @@
 
 #include <QtDebug>
 #include <QFile>
+#include <QTimer>
 #include <QFileSystemWatcher>
 
 Manager *Manager::instance(QObject *parent)
@@ -17,9 +18,14 @@ QString Manager::temperature() const
     return "25ºC";
 }
 
-void Manager::test(QString s)
+void Manager::test()
 {
-    qDebug() << "test slot" << s;
+    qDebug() << "test slot";
+    _current_h++;
+    if (_current_h > 23)
+        _current_h = 0;
+
+   emit currentHour(_current_h);
 }
 
 Manager::Manager(QObject *parent) : QObject(parent),
@@ -27,4 +33,10 @@ Manager::Manager(QObject *parent) : QObject(parent),
 {
     connect(thermostat, &Thermostat::dataChanged,
                     this, &Manager::timelineChanged);
+
+    QTimer *tt = new QTimer(this);
+    connect(tt, &QTimer::timeout, this, &Manager::test);
+    tt->start(300);
+
+    _current_h = 0;
 }

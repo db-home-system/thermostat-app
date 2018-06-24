@@ -28,6 +28,7 @@ struct TimeLineLabel hour[] = {
 #define LABEL_SPACE 65
 #define DIVISION_LINE_LABEL_LEN   15
 #define DIVISION_LINE_H_LEN       20
+#define DIVISION_LINE_MARK_LEN    20
 #define START_ANGLE -60
 #define ANGLE 300
 #define LABEL_SIZE_OFF 7.5
@@ -39,6 +40,12 @@ Timeline::Timeline(QQuickItem *parent) :
     Manager *mgr = Manager::instance();
     connect(mgr, &Manager::timelineChanged,
             this, &Timeline::updateTimeline);
+
+    connect(mgr, &Manager::currentHour,
+            this, &Timeline::updateTimelineMark);
+
+    // Timeline marker, show the current hour slot
+    _current_h = 0;
 }
 
 void Timeline::paint(QPainter *painter)
@@ -54,6 +61,7 @@ void Timeline::paint(QPainter *painter)
 
     QPen timeLine("#8c8a7f");
     QPen timeLineSteps("#800000");
+    QPen timeLineMark("#FFD700");
 
     penMain.setWidth(4);
     penMain.setCapStyle(Qt::FlatCap);
@@ -67,22 +75,37 @@ void Timeline::paint(QPainter *painter)
     timeLineSteps.setWidth(3);
     timeLineSteps.setCapStyle(Qt::FlatCap);
 
+    timeLineMark.setWidth(3);
+    timeLineMark.setCapStyle(Qt::RoundCap);
+
     timeLine.setWidth(2);
     timeLine.setCapStyle(Qt::FlatCap);
 
+    qreal mark_rect_margin_up = timeLineMark.widthF() + LABEL_SPACE - DIVISION_LINE_MARK_LEN;
     qreal sun_rect_margin = penSun.widthF() + LABEL_SPACE;
     qreal main_rect_margin = sun_rect_margin + penMain.widthF() + penSun.widthF() + 1;
     qreal moon_rect_margin = main_rect_margin + penMoon.widthF() + penMain.widthF();
+    qreal mark_rect_margin = moon_rect_margin + timeLineMark.widthF() + 12;
 
     qreal rtSun = sun_rect_margin / 2.0;
     qreal rbSun = bounds.width() - sun_rect_margin;
+
     qreal rtMain = main_rect_margin / 2.0;
     qreal rbMain = bounds.width() - main_rect_margin;
+
     qreal rtMoon = moon_rect_margin / 2.0;
     qreal rbMoon = bounds.width() - moon_rect_margin;
 
+    qreal rtMark_up = mark_rect_margin_up / 2.0;
+    qreal rbMark_up = bounds.width() - mark_rect_margin_up;
+
+    qreal rtMark = mark_rect_margin / 2.0;
+    qreal rbMark = bounds.width() - mark_rect_margin;
+
     QLine division_label_line(0, rbMoon/2-penMain.widthF(), 0, rbMain/2 + DIVISION_LINE_LABEL_LEN);
     QLine division_h_line(0, rbMoon/2-penMain.widthF(), 0, rbMain/2 + DIVISION_LINE_H_LEN);
+    QLine division_mark_line(0, rbMoon/2-penMoon.widthF(), 0, rbMain/2 + DIVISION_LINE_MARK_LEN);
+
 
     // Main Rectangle
     QRectF rect = QRectF(rtSun, rtSun, rbSun, rbSun);
@@ -98,10 +121,12 @@ void Timeline::paint(QPainter *painter)
     if (rect.height() - int(rect.height()) > 0)
         rect.setHeight(qFloor(rect.height()));
 
+    // Timeline Mark Rectangle
+    QRectF rectMark_up = QRectF(rtMark_up, rtMark_up, rbMark_up, rbMark_up);
+    QRectF rectMark_down = QRectF(rtMark, rtMark, rbMark, rbMark);
+
     QRectF rectMain = QRectF(rtMain, rtMain, rbMain, rbMain);
     rectMain.moveCenter(bounds.center());
-
-    //painter->translate(0, 20);
 
     QRectF rectMoon = QRectF(rtMoon, rtMoon, rbMoon, rbMoon);
     rectMoon.moveCenter(bounds.center());
@@ -113,7 +138,7 @@ void Timeline::paint(QPainter *painter)
     fillmain.arcTo(rectMain, -60, 300);
     painter->fillPath(fillmain, QBrush("#00ff33"));
 
-    QPainterPath pathSun, pathMoon;
+    QPainterPath pathSun, pathMoon, pathMark;
     qreal startAngle = 240; //START_ANGLE;
     qreal angle = ROTATE_ANGLE;
     for (int j = 0; j < time_slots.size(); ++j) {
@@ -126,18 +151,29 @@ void Timeline::paint(QPainter *painter)
             pathMoon.arcMoveTo(rectMoon, startAngle);
             pathMoon.arcTo(rectMoon, startAngle,-1 * angle);
         }
+
+        if (j == _current_h) {
+            pathMark.arcMoveTo(rectMark_up, startAngle);
+            pathMark.arcTo(rectMark_up, startAngle, -1 * angle);
+
+            pathMark.arcMoveTo(rectMark_down, startAngle);
+            pathMark.arcTo(rectMark_down, startAngle, -1 * angle);
+        }
+
     }
+
     painter->setPen(penSun);
     painter->drawPath(pathSun);
     painter->setPen(penMoon);
     painter->drawPath(pathMoon);
+    painter->setPen(timeLineMark);
+    painter->drawPath(pathMark);
 
     // Main circle
     QPainterPath pathMain;
     painter->setPen(penMain);
     pathMain.arcMoveTo(rectMain, START_ANGLE);
     pathMain.arcTo(rectMain, START_ANGLE, ANGLE);
-    //painter->fillPath(pathMain, QBrush("#CCFFCC00"));
     painter->drawPath(pathMain);
 
     // Translate origin to compensate label size
@@ -159,8 +195,17 @@ void Timeline::paint(QPainter *painter)
             painter->setPen(timeLine);
             painter->drawLine(division_label_line);
         }
+
+        if (j == (24 - _current_h) ||
+                j == (23 - _current_h))
+        {
+            painter->setPen(timeLineMark);
+            painter->drawLine(division_mark_line);
+        }
+
         painter->rotate(-ROTATE_ANGLE);
     }
+
 }
 
 void Timeline::updateTimeline(QVector<TimelineSlotsData> *p)
@@ -171,3 +216,10 @@ void Timeline::updateTimeline(QVector<TimelineSlotsData> *p)
     update();
 }
 
+void Timeline::updateTimelineMark(int h)
+{
+    if (_current_h != h)
+        _current_h = h;
+
+    update();
+}

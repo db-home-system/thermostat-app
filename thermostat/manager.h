@@ -18,6 +18,7 @@ class Manager : public QObject
 private:
     explicit Manager(QObject *parent = nullptr);
     Thermostat * const thermostat;
+    int _current_h;
 
 public:
     static Manager *instance(QObject *parent = nullptr);
@@ -28,9 +29,10 @@ public:
 signals:
     void temperatureChanged(int temp);
     void timelineChanged(QVector<TimelineSlotsData> *s);
+    void currentHour(int h);
 
 public slots:
-    void test(QString s);
+    void test();
 
 };
 

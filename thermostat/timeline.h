@@ -18,8 +18,11 @@ private:
     void paint(QPainter *painter);
     QVector<TimelineSlotsData> time_slots;
 
+    int _current_h;
+
 public slots:
     void updateTimeline(QVector<TimelineSlotsData> *p);
+    void updateTimelineMark(int h);
 };
 
 #endif // TIMELINE_H
