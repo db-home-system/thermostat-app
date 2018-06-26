@@ -9,18 +9,20 @@ class Weather : public QObject
     Q_OBJECT
 public:
     explicit Weather(QObject *parent = nullptr);
+    double getTemp();
+    void setTemp(float value);
 
 private:
+    double temp = 5.0;
     QTimer *timer;
     QNetworkAccessManager *mgr;
-    QNetworkReply * s;
 
 public slots:
     void getWeather();
-    void testGet(QNetworkReply* s);
+    void getInfo(QNetworkReply *s);
 
 signals:
-    void weatherChanged(QByteArray q);
+    void weatherChanged();
 };
 
 #endif // WEATHER_H

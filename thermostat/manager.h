@@ -24,13 +24,13 @@ class Manager : public QObject
     Q_PROPERTY(QString extTemperature READ extTemperature NOTIFY extTemperatureChanged)
     Q_PROPERTY(int thermostatStatus READ thermostatStatus NOTIFY thermostatStatusChanged)
     Q_PROPERTY(QString time READ time NOTIFY timeChanged)
-    Q_PROPERTY(QString tempo READ tempo NOTIFY weatherTrigger)
+    Q_PROPERTY(QString tempo READ tempo NOTIFY weatherInfo)
 
 private:
     explicit Manager(QObject *parent = nullptr);
     QTimer * timer;
     Thermostat * const thermostat;
-    Weather *weather;
+    Weather *const weather;
     QNetworkAccessManager *mgr;
 
     int _current_h;
@@ -45,7 +45,6 @@ public:
 
     QString time() const;
     QString tempo() const;
-    void random();
 
 signals:
     void timeChanged();
@@ -64,8 +63,7 @@ public slots:
 
     void temperatureChanged(int temp);
     void timelineChanged(QVector<int> *s);
-    void weatherTrigger(QByteArray q);
-
+    void weatherInfo();
 };
 
 #endif // MANAGER_H

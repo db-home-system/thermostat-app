@@ -14,9 +14,11 @@ Window {
         property double extTemperature: Manager.extTemperature
         property string thermostatStatus: Manager.thermostatStatus
         property string time: Manager.time
+        property string tempo: Manager.tempo
     }
 
     Item {
+        id: item1
         anchors.fill: parent
         Image{
             source: "images/logo.png"
@@ -33,6 +35,8 @@ Window {
         }
 
         Text {
+            width: 220
+            height: 34
             anchors.centerIn: parent
             font.pointSize: 24
             anchors.verticalCenterOffset: -32
@@ -60,11 +64,26 @@ Window {
             anchors.centerIn: parent
             font.pointSize: 17
             text: manager.time
-            anchors.verticalCenterOffset: 39
+            anchors.verticalCenterOffset: 32
             anchors.horizontalCenterOffset: 0
             color: 'grey'
             opacity: 0.7
         }
+
+        Text {
+            id: random
+            width: 100
+            font.pointSize: 9
+            text: "Temperature: " + manager.tempo + "°"
+            fontSizeMode: Text.Fit
+            anchors.verticalCenterOffset: 25
+            anchors.horizontalCenterOffset: -190
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignHCenter
+        }
     }
 
 }
+
