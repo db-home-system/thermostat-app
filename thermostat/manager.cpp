@@ -25,7 +25,20 @@ void Manager::test()
     if (_current_h > 23)
         _current_h = 0;
 
-   emit currentHour(_current_h);
+    emit currentHour(_current_h);
+}
+
+void Manager::heaterStatusUpdate(bool status)
+{
+   if (heater_status != status)
+       heater_status = status;
+
+   emit heaterStatusChanged();
+}
+
+void Manager::heaterStatus() const
+{
+   return heater_status;
 }
 
 Manager::Manager(QObject *parent) : QObject(parent),
@@ -33,6 +46,9 @@ Manager::Manager(QObject *parent) : QObject(parent),
 {
     connect(thermostat, &Thermostat::dataChanged,
                     this, &Manager::timelineChanged);
+
+    connect(thermostat, &Thermostat::heaterStatusChanged,
+                    this, &Manager::heaterStatusUpdate);
 
     QTimer *tt = new QTimer(this);
     connect(tt, &QTimer::timeout, this, &Manager::test);

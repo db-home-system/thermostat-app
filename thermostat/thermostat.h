@@ -21,6 +21,7 @@ public slots:
 
 signals:
     void dataChanged(QVector<TimelineSlotsData> *timeline);
+    void heaterStatusChanged(bool status);
 
 private:
     void pidControll();

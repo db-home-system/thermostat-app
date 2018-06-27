@@ -126,6 +126,8 @@ void Thermostat::pidControll()
 void Thermostat::heaterOnOff(bool cmd)
 {
     qDebug() << "Heater " << cmd;
+
+    emit heaterStatusChanged(cmd);
 }
 
 bool Thermostat::loadTimelineCfg(QString cfg, QList<QStringList> &l)
