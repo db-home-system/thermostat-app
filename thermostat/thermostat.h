@@ -15,13 +15,15 @@ class Thermostat : public QObject
 public:
     explicit Thermostat(QObject *parent = nullptr);
 
+    int status() { return _status; }
+
 public slots:
     void fileSettingsChanged();
     void dirSettingsChanged();
 
 signals:
     void dataChanged(QVector<TimelineSlotsData> *timeline);
-    void heaterStatusChanged(bool status);
+    void statusChanged();
 
 private:
     void pidControll();
@@ -41,7 +43,10 @@ private:
 
     QVector<TimelineSlotsData> timeline_slots;
 
-    int current_hour;
+    int _current_hour;
+
+    // Status of thermostatat
+    int _status;
 };
 
 #endif // THERMOSTAT_H

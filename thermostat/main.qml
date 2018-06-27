@@ -11,6 +11,7 @@ Window {
     Item {
         id: manager
         property string temperature: Manager.temperature
+        property string thermostatStatus: Manager.thermostatStatus
     }
 
     Item {
@@ -27,13 +28,23 @@ Window {
             anchors.centerIn: parent
             width: 270
             height: 270
-
         }
 
         Text {
             anchors.centerIn: parent
             font.pointSize: 24
             text : "<b>"+ manager.temperature+"</b>"
+        }
+
+        Text {
+            id: thermostat
+            anchors.centerIn: parent
+            font.pointSize: 17
+            text: manager.thermostatStatus
+            anchors.verticalCenterOffset: 32
+            anchors.horizontalCenterOffset: 0
+            color: 'grey'
+            opacity: 0.7
         }
     }
 

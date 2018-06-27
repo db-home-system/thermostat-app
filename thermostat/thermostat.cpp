@@ -102,9 +102,9 @@ void Thermostat::fileSettingsChanged()
 void Thermostat::pidControll()
 {
     QTime now = QTime::currentTime();
-    current_hour = now.hour();
+    _current_hour = now.hour();
 
-    float sp = timeline_slots[current_hour].tempSP;
+    float sp = timeline_slots[_current_hour].tempSP;
     qDebug() << "pid " << sp;
 
     float temp_dev  =  readDeviceTemperature();
@@ -119,15 +119,16 @@ void Thermostat::pidControll()
     if (processed_temp < sp)
         onoff = true;
 
-    heaterOnOff(onoff);
+    _status = onoff;
 
+    heaterOnOff(onoff);
 }
 
 void Thermostat::heaterOnOff(bool cmd)
 {
     qDebug() << "Heater " << cmd;
 
-    emit heaterStatusChanged(cmd);
+    emit statusChanged();
 }
 
 bool Thermostat::loadTimelineCfg(QString cfg, QList<QStringList> &l)

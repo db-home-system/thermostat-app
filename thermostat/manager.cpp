@@ -18,6 +18,11 @@ QString Manager::temperature() const
     return "25ºC";
 }
 
+int Manager::thermostatStatus() const
+{
+   return thermostat->status();
+}
+
 void Manager::test()
 {
     qDebug() << "test slot";
@@ -28,18 +33,6 @@ void Manager::test()
     emit currentHour(_current_h);
 }
 
-void Manager::heaterStatusUpdate(bool status)
-{
-   if (heater_status != status)
-       heater_status = status;
-
-   emit heaterStatusChanged();
-}
-
-void Manager::heaterStatus() const
-{
-   return heater_status;
-}
 
 Manager::Manager(QObject *parent) : QObject(parent),
   thermostat(new Thermostat(this))
@@ -47,8 +40,8 @@ Manager::Manager(QObject *parent) : QObject(parent),
     connect(thermostat, &Thermostat::dataChanged,
                     this, &Manager::timelineChanged);
 
-    connect(thermostat, &Thermostat::heaterStatusChanged,
-                    this, &Manager::heaterStatusUpdate);
+    connect(thermostat, &Thermostat::statusChanged,
+                    this, &Manager::thermostatStatusChanged);
 
     QTimer *tt = new QTimer(this);
     connect(tt, &QTimer::timeout, this, &Manager::test);

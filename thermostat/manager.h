@@ -14,30 +14,32 @@ class Manager : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString temperature READ temperature NOTIFY temperatureChanged)
-    Q_PROPERTY(bool heaterStatus READ heaterStatus NOTIFY heaterStatusChanged)
+    Q_PROPERTY(int thermostatStatus READ thermostatStatus NOTIFY thermostatStatusChanged)
 
 private:
     explicit Manager(QObject *parent = nullptr);
     Thermostat * const thermostat;
 
     int _current_h;
-    bool heater_status;
 
 public:
     static Manager *instance(QObject *parent = nullptr);
 
-    // Temperature
+    // Thermostat property
     QString temperature() const;
-    bool heaterStatus() const;
+    int thermostatStatus() const;
 
 signals:
-    void temperatureChanged(int temp);
+    // Timeline signals
     void timelineChanged(QVector<TimelineSlotsData> *s);
     void currentHour(int h);
 
+    // Thermostat singnals
+    void thermostatStatusChanged();
+    void temperatureChanged(int temp);
+
 public slots:
     void test();
-    void heaterStatusUpdate(bool status);
 
 };
 
