@@ -15,7 +15,9 @@ class Thermostat : public QObject
 public:
     explicit Thermostat(QObject *parent = nullptr);
 
-    int status() { return _status; }
+    int status()    { return _status;   }
+    float intTemp() { return _int_temp; }
+    float extTemp() { return _ext_temp; }
 
 public slots:
     void fileSettingsChanged();
@@ -47,6 +49,8 @@ private:
 
     // Status of thermostatat
     int _status;
+    float _int_temp;
+    float _ext_temp;
 };
 
 #endif // THERMOSTAT_H

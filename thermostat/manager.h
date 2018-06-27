@@ -13,7 +13,8 @@ struct TimelineSlotsData {
 class Manager : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString temperature READ temperature NOTIFY temperatureChanged)
+    Q_PROPERTY(QString intTemperature READ intTemperature NOTIFY intTemperatureChanged)
+    Q_PROPERTY(QString extTemperature READ extTemperature NOTIFY extTemperatureChanged)
     Q_PROPERTY(int thermostatStatus READ thermostatStatus NOTIFY thermostatStatusChanged)
 
 private:
@@ -26,7 +27,8 @@ public:
     static Manager *instance(QObject *parent = nullptr);
 
     // Thermostat property
-    QString temperature() const;
+    QString intTemperature() const;
+    QString extTemperature() const;
     int thermostatStatus() const;
 
 signals:
@@ -36,7 +38,8 @@ signals:
 
     // Thermostat singnals
     void thermostatStatusChanged();
-    void temperatureChanged(int temp);
+    void intTemperatureChanged();
+    void extTemperatureChanged();
 
 public slots:
     void test();

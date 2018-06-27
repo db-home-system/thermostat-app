@@ -35,6 +35,10 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
 
     // Trigger first time the timeline setting configuration
     QTimer::singleShot(100, this, &Thermostat::fileSettingsChanged);
+
+    _status = 0;
+    _int_temp = 0;
+    _ext_temp = 0;
 }
 
 void Thermostat::dirSettingsChanged()
@@ -120,15 +124,17 @@ void Thermostat::pidControll()
         onoff = true;
 
     _status = onoff;
+    _int_temp = (temp_dev + temp_sens) / 2;
+    _ext_temp = temp_ext;
 
     heaterOnOff(onoff);
+
+    emit statusChanged();
 }
 
 void Thermostat::heaterOnOff(bool cmd)
 {
     qDebug() << "Heater " << cmd;
-
-    emit statusChanged();
 }
 
 bool Thermostat::loadTimelineCfg(QString cfg, QList<QStringList> &l)

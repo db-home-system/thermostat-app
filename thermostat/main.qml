@@ -10,7 +10,8 @@ Window {
 
     Item {
         id: manager
-        property string temperature: Manager.temperature
+        property string intTemperature: Manager.intTemperature
+        property double extTemperature: Manager.extTemperature
         property string thermostatStatus: Manager.thermostatStatus
     }
 
@@ -33,7 +34,15 @@ Window {
         Text {
             anchors.centerIn: parent
             font.pointSize: 24
-            text : "<b>"+ manager.temperature+"</b>"
+            anchors.verticalCenterOffset: -32
+            anchors.horizontalCenterOffset: 0
+            text : "<b>" + manager.intTemperature + "</b>"
+        }
+
+        Text {
+            anchors.centerIn: parent
+            font.pointSize: 22
+            text : manager.extTemperature
         }
 
         Text {

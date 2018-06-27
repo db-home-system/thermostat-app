@@ -13,9 +13,14 @@ Manager *Manager::instance(QObject *parent)
     return manager_instance;
 }
 
-QString Manager::temperature() const
+QString Manager::intTemperature() const
 {
-    return "25ºC";
+    return QString::number(thermostat->intTemp(), 'f', 1);
+}
+
+QString Manager::extTemperature() const
+{
+    return QString::number(thermostat->extTemp(), 'f', 1);
 }
 
 int Manager::thermostatStatus() const
@@ -42,6 +47,13 @@ Manager::Manager(QObject *parent) : QObject(parent),
 
     connect(thermostat, &Thermostat::statusChanged,
                     this, &Manager::thermostatStatusChanged);
+
+    connect(thermostat, &Thermostat::statusChanged,
+                    this, &Manager::intTemperatureChanged);
+
+    connect(thermostat, &Thermostat::statusChanged,
+                    this, &Manager::extTemperatureChanged);
+
 
     QTimer *tt = new QTimer(this);
     connect(tt, &QTimer::timeout, this, &Manager::test);
