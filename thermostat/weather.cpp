@@ -34,14 +34,24 @@ void Weather::setTemp(float value)
     temp = value;
 }
 
+QString Weather::getWIcon()
+{
+    return wIcon;
+}
+
+void Weather::setWIcon(QString value)
+{
+    wIcon = value;
+}
+
 void Weather::getInfo(QNetworkReply *s)
 {
     QJsonDocument itemDoc = QJsonDocument::fromJson(s->readAll());
     QJsonObject obj = itemDoc.object();
-    QJsonValue x = obj.value("list").toArray()[0].toObject()["temp"];
-    x = x["day"];
-    qDebug() << x.toDouble();
+    QJsonValue lfTemp = obj.value("list").toArray()[0].toObject()["temp"];
+    setTemp(lfTemp["day"].toDouble());
 
-    setTemp(x.toDouble());
+    QJsonValue lfIcon = obj.value("list").toArray()[0].toObject().value("weather").toArray()[0];
+    qDebug() << lfIcon["icon"].toString();
     emit weatherChanged();
 }

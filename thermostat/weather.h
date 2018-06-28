@@ -11,9 +11,12 @@ public:
     explicit Weather(QObject *parent = nullptr);
     double getTemp();
     void setTemp(float value);
+    QString getWIcon();
+    void setWIcon(QString value);
 
 private:
-    double temp = 5.0;
+    QString wIcon = "00d";
+    double temp = 0.0;
     QTimer *timer;
     QNetworkAccessManager *mgr;
 

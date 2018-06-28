@@ -17,7 +17,7 @@ SOURCES += \
     thermostat.cpp \
     timeline.cpp \
     manager.cpp \
-    weather.cpp
+    weather.cpp \
 
 RESOURCES += qml.qrc
 
@@ -33,8 +33,21 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    app-config.h \
+    manager.h \
     thermostat.h \
     timeline.h \
-    manager.h \
-    app-config.h \
     weather.h
+
+DISTFILES += \
+    images/logo.png \
+    images/icons/00d.svg \
+    images/icons/01d.svg \
+    images/icons/02d.svg \
+    images/icons/03d.svg \
+    images/icons/04d.svg \
+    images/icons/09d.svg \
+    images/icons/10d.svg \
+    images/icons/11d.svg \
+    images/icons/13d.svg \
+    images/icons/50d.svg

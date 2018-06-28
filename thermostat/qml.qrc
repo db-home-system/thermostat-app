@@ -2,5 +2,15 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>images/logo.png</file>
+        <file>images/icons/00d.svg</file>
+        <file>images/icons/01d.svg</file>
+        <file>images/icons/02d.svg</file>
+        <file>images/icons/03d.svg</file>
+        <file>images/icons/04d.svg</file>
+        <file>images/icons/09d.svg</file>
+        <file>images/icons/10d.svg</file>
+        <file>images/icons/11d.svg</file>
+        <file>images/icons/13d.svg</file>
+        <file>images/icons/50d.svg</file>
     </qresource>
 </RCC>

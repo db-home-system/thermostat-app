@@ -17,6 +17,11 @@ Manager *Manager::instance(QObject *parent)
 }
 
 
+QString Manager::icon() const
+{
+    return weather->getWIcon();
+}
+
 QString Manager::tempo() const
 {
     return QString::number(weather->getTemp());

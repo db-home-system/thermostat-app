@@ -15,6 +15,7 @@ Window {
         property string thermostatStatus: Manager.thermostatStatus
         property string time: Manager.time
         property string tempo: Manager.tempo
+        property string icon: Manager.icon
     }
 
     Item {
@@ -24,6 +25,13 @@ Window {
             source: "images/logo.png"
             anchors.top: parent.top
             width: 80; height: 80
+            fillMode: Image.PreserveAspectFit
+        }
+
+        Image {
+            id: weatherIcon
+            source: "images/icons/" + manager.icon + ".svg"
+            width: 50; height:50
             fillMode: Image.PreserveAspectFit
         }
 

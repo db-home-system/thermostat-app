@@ -25,6 +25,7 @@ class Manager : public QObject
     Q_PROPERTY(int thermostatStatus READ thermostatStatus NOTIFY thermostatStatusChanged)
     Q_PROPERTY(QString time READ time NOTIFY timeChanged)
     Q_PROPERTY(QString tempo READ tempo NOTIFY weatherInfo)
+    Q_PROPERTY(QString icon READ icon NOTIFY weatherInfo)
 
 private:
     explicit Manager(QObject *parent = nullptr);
@@ -45,6 +46,7 @@ public:
 
     QString time() const;
     QString tempo() const;
+    QString icon() const;
 
 signals:
     void timeChanged();
