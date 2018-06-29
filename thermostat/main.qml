@@ -52,23 +52,23 @@ Window {
         }
 
         Text {
-            id: thermostat
-            anchors.centerIn: parent
-            font.pointSize: 17
-            anchors.verticalCenterOffset: 32
-            anchors.horizontalCenterOffset: 0
-            text: manager.thermostatStatus
-        }
-
-        Text {
             id: clock
             anchors.centerIn: parent
             font.pointSize: 17
             text: manager.time
-            anchors.verticalCenterOffset: 64
+            anchors.verticalCenterOffset: 32
             anchors.horizontalCenterOffset: 0
             color: 'grey'
             opacity: 0.7
+        }
+
+        Text {
+            id: thermostat
+            anchors.centerIn: parent
+            font.pointSize: 17
+            anchors.verticalCenterOffset: 64
+            anchors.horizontalCenterOffset: 0
+            text: manager.thermostatStatus
         }
 
         Image {
