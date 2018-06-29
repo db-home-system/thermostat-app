@@ -37,12 +37,9 @@ struct TimeLineLabel hour[] = {
 Timeline::Timeline(QQuickItem *parent) :
     QQuickPaintedItem(parent)
 {
-    Manager *mgr = Manager::instance();
-    connect(mgr, &Manager::timelineChanged,
-            this, &Timeline::updateTimeline);
-
-    connect(mgr, &Manager::currentHour,
-            this, &Timeline::updateTimelineMark);
+    Manager *mgr_class = Manager::instance();
+    connect(mgr_class, &Manager::timelineChanged, this, &Timeline::updateTimeline);
+    connect(mgr_class, &Manager::currentHour, this, &Timeline::updateTimelineMark);
 
     // Timeline marker, show the current hour slot
     _current_h = 0;
@@ -208,11 +205,11 @@ void Timeline::paint(QPainter *painter)
 
 }
 
-void Timeline::updateTimeline(QVector<TimelineSlotsData> *p)
+void Timeline::updateTimeline(QVector<TimelineSlotsData> &p)
 {
-    time_slots.resize(p->size());
-    for (int i = 0; i < p->size(); i++)
-        time_slots[i].onOff = p->at(i).onOff;
+    time_slots.resize(p.size());
+    for (int i = 0; i < p.size(); i++)
+        time_slots[i].onOff = p.at(i).onOff;
     update();
 }
 

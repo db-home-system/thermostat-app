@@ -28,15 +28,6 @@ Window {
             fillMode: Image.PreserveAspectFit
         }
 
-        Image {
-            id: weatherIcon
-            x: 412
-            y: 8
-            source: "images/icons/" + manager.icon + ".svg"
-            width: 50; height:50
-            fillMode: Image.PreserveAspectFit
-        }
-
         Timeline {
             id: timeline
             anchors.centerIn: parent
@@ -45,8 +36,6 @@ Window {
         }
 
         Text {
-            width: 220
-            height: 34
             anchors.centerIn: parent
             font.pointSize: 24
             anchors.verticalCenterOffset: -32
@@ -57,6 +46,8 @@ Window {
         Text {
             anchors.centerIn: parent
             font.pointSize: 22
+            anchors.verticalCenterOffset: 0
+            anchors.horizontalCenterOffset: 0
             text : manager.extTemperature
         }
 
@@ -74,14 +65,23 @@ Window {
             anchors.centerIn: parent
             font.pointSize: 17
             text: manager.time
-            anchors.verticalCenterOffset: 32
+            anchors.verticalCenterOffset: 64
             anchors.horizontalCenterOffset: 0
             color: 'grey'
             opacity: 0.7
         }
 
+        Image {
+            id: weatherIcon
+            x: 412
+            y: 8
+            source: "images/icons/" + manager.icon + ".svg"
+            width: 50; height:50
+            fillMode: Image.PreserveAspectFit
+        }
+
         Text {
-            id: random
+            id: weatherInfo
             width: 100
             color: "#8d8d8d"
             text: manager.tempo + "°"
@@ -95,6 +95,5 @@ Window {
             horizontalAlignment: Text.AlignHCenter
         }
     }
-
 }
 

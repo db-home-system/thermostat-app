@@ -24,7 +24,7 @@ public slots:
     void dirSettingsChanged();
 
 signals:
-    void dataChanged(QVector<TimelineSlotsData> *timeline);
+    void dataChanged(QVector<TimelineSlotsData> &timeline);
     void statusChanged();
 
 private:

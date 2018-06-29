@@ -13,6 +13,7 @@
 Manager *Manager::instance(QObject *parent)
 {
     static Manager *manager_instance = new Manager(parent);
+
     return manager_instance;
 }
 
@@ -63,12 +64,13 @@ void Manager::test()
 Manager::Manager(QObject *parent) : QObject(parent),
   thermostat(new Thermostat(this)), weather(new Weather(this))
 {
+    // Timer for clock display
     timer = new QTimer(this);
     timer->setInterval(1000);
     timer->start();
-
     connect(timer, &QTimer::timeout, this, &Manager::timeChanged);
 
+    // Signal to manage timeline and temperature
     connect(thermostat, &Thermostat::dataChanged,
                     this, &Manager::timelineChanged);
 
@@ -81,12 +83,12 @@ Manager::Manager(QObject *parent) : QObject(parent),
     connect(thermostat, &Thermostat::statusChanged,
                     this, &Manager::extTemperatureChanged);
 
+    // Weather info signals
+    connect(weather, &Weather::weatherChanged, this, &Manager::weatherInfo);
+
+    _current_h = 0;
 
     QTimer *tt = new QTimer(this);
     connect(tt, &QTimer::timeout, this, &Manager::test);
     tt->start(300);
-
-    _current_h = 0;
-
-    connect(weather, &Weather::weatherChanged, this, &Manager::weatherInfo);
 }

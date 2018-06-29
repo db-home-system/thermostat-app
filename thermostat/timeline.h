@@ -21,7 +21,7 @@ private:
     int _current_h;
 
 public slots:
-    void updateTimeline(QVector<TimelineSlotsData> *p);
+    void updateTimeline(QVector<TimelineSlotsData> &p);
     void updateTimelineMark(int h);
 };
 

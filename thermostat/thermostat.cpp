@@ -98,7 +98,7 @@ void Thermostat::fileSettingsChanged()
             timeline_slots[h].onOff = on_off;
             timeline_slots[h].tempSP = slot_temp;
         }
-        emit dataChanged(&timeline_slots);
+        emit dataChanged(timeline_slots);
     }
 }
 

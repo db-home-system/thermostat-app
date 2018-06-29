@@ -20,19 +20,25 @@ struct TimelineSlotsData {
 class Manager : public QObject
 {
     Q_OBJECT
+
+    // Thermostat property
     Q_PROPERTY(QString intTemperature READ intTemperature NOTIFY intTemperatureChanged)
     Q_PROPERTY(QString extTemperature READ extTemperature NOTIFY extTemperatureChanged)
     Q_PROPERTY(int thermostatStatus READ thermostatStatus NOTIFY thermostatStatusChanged)
+
+    // Time property
     Q_PROPERTY(QString time READ time NOTIFY timeChanged)
+
+    // Weather property
     Q_PROPERTY(QString tempo READ tempo NOTIFY weatherInfo)
     Q_PROPERTY(QString icon READ icon NOTIFY weatherInfo)
 
 private:
     explicit Manager(QObject *parent = nullptr);
+
     QTimer * timer;
     Thermostat * const thermostat;
     Weather *const weather;
-    QNetworkAccessManager *mgr;
 
     int _current_h;
 
@@ -52,7 +58,7 @@ signals:
     void timeChanged();
 
     // Timeline signals
-    void timelineChanged(QVector<TimelineSlotsData> *s);
+    void timelineChanged(QVector<TimelineSlotsData> &s);
     void currentHour(int h);
 
     // Thermostat singnals
@@ -60,12 +66,10 @@ signals:
     void intTemperatureChanged();
     void extTemperatureChanged();
 
+    void weatherInfo();
+
 public slots:
     void test();
-
-    void temperatureChanged(int temp);
-    void timelineChanged(QVector<int> *s);
-    void weatherInfo();
 };
 
 #endif // MANAGER_H
