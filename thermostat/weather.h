@@ -9,20 +9,17 @@ class Weather : public QObject
     Q_OBJECT
 public:
     explicit Weather(QObject *parent = nullptr);
-    double getTemp();
-    void setTemp(float value);
-    QString getWIcon();
-    void setWIcon(QString value);
+
+    double getTemp()   { return _temp; }
+    QString getWIcon() { return _icon; }
 
 private:
-    QString wIcon = "00d";
-    double temp = 0.0;
-    QTimer *timer;
-    QNetworkAccessManager *mgr;
+    QString _icon = "00d";
+    double _temp = 0.0;
 
-public slots:
-    void getWeather();
+    QNetworkAccessManager *const netMgr;
     void getInfo(QNetworkReply *s);
+    void getWeather();
 
 signals:
     void weatherChanged();
