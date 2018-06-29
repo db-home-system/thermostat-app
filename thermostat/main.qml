@@ -30,6 +30,8 @@ Window {
 
         Image {
             id: weatherIcon
+            x: 412
+            y: 8
             source: "images/icons/" + manager.icon + ".svg"
             width: 50; height:50
             fillMode: Image.PreserveAspectFit
@@ -81,11 +83,12 @@ Window {
         Text {
             id: random
             width: 100
+            color: "#8d8d8d"
+            text: manager.tempo + "°"
             font.pointSize: 9
-            text: "Temperature: " + manager.tempo + "°"
             fontSizeMode: Text.Fit
-            anchors.verticalCenterOffset: 25
-            anchors.horizontalCenterOffset: -190
+            anchors.verticalCenterOffset: -63
+            anchors.horizontalCenterOffset: 197
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             verticalAlignment: Text.AlignVCenter

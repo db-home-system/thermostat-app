@@ -12,5 +12,14 @@
         <file>images/icons/11d.svg</file>
         <file>images/icons/13d.svg</file>
         <file>images/icons/50d.svg</file>
+        <file>images/icons/01n.svg</file>
+        <file>images/icons/02n.svg</file>
+        <file>images/icons/03n.svg</file>
+        <file>images/icons/04n.svg</file>
+        <file>images/icons/09n.svg</file>
+        <file>images/icons/10n.svg</file>
+        <file>images/icons/11n.svg</file>
+        <file>images/icons/13n.svg</file>
+        <file>images/icons/50n.svg</file>
     </qresource>
 </RCC>

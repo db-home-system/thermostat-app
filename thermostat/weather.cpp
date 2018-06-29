@@ -52,6 +52,6 @@ void Weather::getInfo(QNetworkReply *s)
     setTemp(lfTemp["day"].toDouble());
 
     QJsonValue lfIcon = obj.value("list").toArray()[0].toObject().value("weather").toArray()[0];
-    qDebug() << lfIcon["icon"].toString();
+    setWIcon(lfIcon["icon"].toString());
     emit weatherChanged();
 }
