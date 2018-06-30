@@ -41,7 +41,7 @@ void Weather::getInfo(QNetworkReply *s)
 
     QJsonValue lfIcon = obj.value("list").toArray()[0].toObject().value("weather").toArray()[0];
     QString icon = lfIcon["icon"].toString();
-    if (icon != _icon)
+    if ((icon != _icon) && (icon != ""))
     {
         _icon = icon;
         flag = true;
