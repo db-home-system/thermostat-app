@@ -27,7 +27,7 @@ class Manager : public QObject
     Q_PROPERTY(int thermostatStatus READ thermostatStatus NOTIFY thermostatStatusChanged)
 
     // Time property
-    Q_PROPERTY(QString time READ time NOTIFY timeChanged)
+    Q_PROPERTY(QString displayClock READ displayClock NOTIFY clockChanged)
 
     // Weather property
     Q_PROPERTY(QString tempo READ tempo NOTIFY weatherInfo)
@@ -41,6 +41,8 @@ private:
     Weather *const weather;
 
     int _current_h;
+    QString _diplay_clock;
+    void internalClockTicks();
 
 public:
     static Manager *instance(QObject *parent = nullptr);
@@ -50,12 +52,13 @@ public:
     QString extTemperature() const;
     int thermostatStatus() const;
 
-    QString time() const;
+    QString displayClock() const;
     QString tempo() const;
     QString icon() const;
 
+
 signals:
-    void timeChanged();
+    void clockChanged();
 
     // Timeline signals
     void timelineChanged(QVector<TimelineSlotsData> &s);

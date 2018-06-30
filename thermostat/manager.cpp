@@ -29,11 +29,9 @@ QString Manager::tempo() const
 }
 
 
-QString Manager::time() const
+QString Manager::displayClock() const
 {
-    QTime timeclock = QTime::currentTime();
-    QString text = timeclock.toString("hh:mm:ss");
-    return text;
+    return _diplay_clock;
 }
 
 QString Manager::intTemperature() const
@@ -51,24 +49,40 @@ int Manager::thermostatStatus() const
    return thermostat->status();
 }
 
+void Manager::internalClockTicks()
+{
+    qDebug() << "Ticks elapse";
+
+    QTime timeclock = QTime::currentTime();
+    _diplay_clock = timeclock.toString("hh:mm:ss");
+
+    if (timeclock.hour() != _current_h)
+    {
+      _current_h = timeclock.hour();
+      if (_current_h > 23)
+          _current_h = 0;
+
+      emit currentHour(_current_h);
+    }
+
+    emit clockChanged();
+}
+
 void Manager::test()
 {
-    qDebug() << "test slot";
-    _current_h++;
-    if (_current_h > 23)
-        _current_h = 0;
-
-    emit currentHour(_current_h);
 }
 
 Manager::Manager(QObject *parent) : QObject(parent),
   thermostat(new Thermostat(this)), weather(new Weather(this))
 {
+    // Timeline mark updater
+    _current_h = 0;
+
     // Timer for clock display
     timer = new QTimer(this);
     timer->setInterval(1000);
     timer->start();
-    connect(timer, &QTimer::timeout, this, &Manager::timeChanged);
+    connect(timer, &QTimer::timeout, this, &Manager::internalClockTicks);
 
     // Signal to manage timeline and temperature
     connect(thermostat, &Thermostat::dataChanged,
@@ -86,9 +100,4 @@ Manager::Manager(QObject *parent) : QObject(parent),
     // Weather info signals
     connect(weather, &Weather::weatherChanged, this, &Manager::weatherInfo);
 
-    _current_h = 0;
-
-    QTimer *tt = new QTimer(this);
-    connect(tt, &QTimer::timeout, this, &Manager::test);
-    tt->start(300);
 }
