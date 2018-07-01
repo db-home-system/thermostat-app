@@ -36,6 +36,36 @@ QString settingsPath()
     return p;
 }
 
+QString inputsRootPath()
+{
+    QString p = "/var/lib/thermapp/input/";
+    QByteArray qroot_path = qgetenv("THERMAPP_INPUT_ROOT");
+    if (!qroot_path.isEmpty())
+        p = QString::fromLocal8Bit(qroot_path);
+
+    return p;
+}
+
+
+QString readLineFromFile(QString f)
+{
+    QString l = "";
+    QFile file(f);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << file.errorString();
+        return l;
+    }
+
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        line = line.trimmed();
+        l = QString::fromLocal8Bit(line);
+    }
+    file.close();
+
+    return l;
+}
+
 QString simRootPath()
 {
     // root path for all settings
@@ -70,21 +100,11 @@ int simTick()
     return p;
 }
 
-QString getTimeClock()
+QString getSimTimeClock()
 {
-    QString l = "00:00:00";
+    QString ll = readLineFromFile(simPath());
+    if (ll == "")
+        return "00:00:00";
 
-    QFile file(simPath());
-    if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << file.errorString();
-        return l;
-    }
-
-    while (!file.atEnd()) {
-        QByteArray line = file.readLine();
-        l = line.trimmed();
-    }
-    file.close();
-
-    return l;
+    return ll;
 }

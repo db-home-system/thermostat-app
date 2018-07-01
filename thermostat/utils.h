@@ -3,13 +3,17 @@
 
 #include <QString>
 
-bool isSimMode();
+QString readLineFromFile(QString f);
+
 QString settingsRootPath();
 QString settingsPath();
 
+QString inputsRootPath();
+
+bool isSimMode();
 QString simRootPath();
 QString simPath();
 int simTick();
-QString getTimeClock();
+QString getSimTimeClock();
 
 #endif // UTILS_H

@@ -51,6 +51,8 @@ private:
     int _status;
     float _int_temp;
     float _ext_temp;
+
+    QString _input_root_path;
 };
 
 #endif // THERMOSTAT_H

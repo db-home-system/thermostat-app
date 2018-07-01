@@ -64,7 +64,7 @@ void Manager::internalClockTicks()
     if (isSimMode())
     {
         qDebug() << "Warning Simulation mode!";
-        _diplay_clock = getTimeClock();
+        _diplay_clock = getSimTimeClock();
         QString h = _diplay_clock.split(":")[0];
         hour_clock = h.toInt();
     }

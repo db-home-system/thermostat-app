@@ -39,14 +39,15 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
     _status = 0;
     _int_temp = 0;
     _ext_temp = 0;
+
+    // root path for all settings
+    _root_path = settingsRootPath();
+    _settings_path =  settingsPath();
+    _input_root_path = inputsRootPath();
 }
 
 void Thermostat::dirSettingsChanged()
 {
-    // root path for all settings
-    _root_path = settingsRootPath();
-    _settings_path =  settingsPath();
-
     qDebug() << _root_path << _settings_path;
 
     _watcher->addPath(_root_path);
@@ -152,7 +153,11 @@ bool Thermostat::loadTimelineCfg(QString cfg, QList<QStringList> &l)
 
 float Thermostat::readDeviceTemperature()
 {
-    return qrand() % ((22 + 1) - 18) + 18;
+    QString t = readLineFromFile(_input_root_path + "device_temp.cfg");
+    if (t == "")
+        return -273.0;
+
+    return t.toFloat();
 }
 
 float Thermostat::readSensorExtTemperature()
