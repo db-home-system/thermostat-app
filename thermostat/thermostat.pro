@@ -18,6 +18,7 @@ SOURCES += \
     timeline.cpp \
     manager.cpp \
     weather.cpp \
+    utils.cpp
 
 RESOURCES += qml.qrc
 
@@ -37,7 +38,8 @@ HEADERS += \
     manager.h \
     thermostat.h \
     timeline.h \
-    weather.h
+    weather.h \
+    utils.h
 
 DISTFILES += \
     images/logo.png \

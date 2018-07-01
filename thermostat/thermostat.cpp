@@ -1,6 +1,7 @@
 #include "app-config.h"
 #include "manager.h"
 #include "thermostat.h"
+#include "utils.h"
 
 #include <QVector>
 #include <QTimer>
@@ -43,15 +44,8 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
 void Thermostat::dirSettingsChanged()
 {
     // root path for all settings
-    _root_path = APP_SETTINGS_ROOT;
-    QByteArray qroot_path = qgetenv(APP_SETTINGS_ROOT_ENV);
-    if (!qroot_path.isEmpty())
-        _root_path = QString::fromLocal8Bit(qroot_path);
-
-    _settings_path = _root_path + TIMELINE_CFG;
-    QByteArray qsettings_path = qgetenv(TIMELINE_CFG_ENV);
-    if (!qsettings_path.isEmpty())
-        _settings_path = QString::fromLocal8Bit(qsettings_path);
+    _root_path = settingsRootPath();
+    _settings_path =  settingsPath();
 
     qDebug() << _root_path << _settings_path;
 

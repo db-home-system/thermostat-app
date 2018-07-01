@@ -1,7 +1,8 @@
 #include "manager.h"
 #include "thermostat.h"
 #include "weather.h"
-#include <QtDebug>
+#include "utils.h"
+
 #include <QFile>
 #include <QTimer>
 #include <QFileSystemWatcher>
@@ -9,6 +10,8 @@
 #include <QTimer>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+
+#include <QtDebug>
 
 Manager *Manager::instance(QObject *parent)
 {
@@ -55,10 +58,21 @@ void Manager::internalClockTicks()
 
     QTime timeclock = QTime::currentTime();
     _diplay_clock = timeclock.toString("hh:mm:ss");
+    int hour_clock = timeclock.hour();
 
-    if (timeclock.hour() != _current_h)
+    // In simulation mode overwrite current time
+    if (isSimMode())
     {
-      _current_h = timeclock.hour();
+        qDebug() << "Warning Simulation mode!";
+        _diplay_clock = getTimeClock();
+        QString h = _diplay_clock.split(":")[0];
+        hour_clock = h.toInt();
+    }
+
+
+    if (hour_clock != _current_h)
+    {
+      _current_h = hour_clock;
       if (_current_h > 23)
           _current_h = 0;
 
@@ -78,9 +92,13 @@ Manager::Manager(QObject *parent) : QObject(parent),
     // Timeline mark updater
     _current_h = 0;
 
+    int tick = 1000;
+    if (isSimMode())
+        tick = simTick();
+
     // Timer for clock display
     timer = new QTimer(this);
-    timer->setInterval(1000);
+    timer->setInterval(tick);
     timer->start();
     connect(timer, &QTimer::timeout, this, &Manager::internalClockTicks);
 
