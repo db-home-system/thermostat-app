@@ -2,8 +2,11 @@
 #define UTILS_H
 
 #include <QString>
+#include <QList>
+#include <QStringList>
 
 QString readLineFromFile(QString f);
+bool readCSVFile(QString f, QList<QStringList> &l);
 
 QString settingsRootPath();
 QString settingsPath();

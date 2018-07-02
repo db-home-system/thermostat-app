@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QFile>
 #include <QDebug>
+#include <QList>
+#include <QStringList>
 
 bool isSimMode()
 {
@@ -64,6 +66,26 @@ QString readLineFromFile(QString f)
     file.close();
 
     return l;
+}
+
+bool readCSVFile(QString f, QList<QStringList> &l)
+{
+    QFile file(f);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << file.errorString();
+        return false;
+    }
+
+    while (!file.atEnd()) {
+        QByteArray line = file.readLine();
+        line = line.trimmed();
+        QString lline = QString::fromLocal8Bit(line);
+        l.append(lline.split(';'));
+        qDebug() << lline;
+    }
+    file.close();
+
+    return true;
 }
 
 QString simRootPath()

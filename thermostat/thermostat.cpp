@@ -60,7 +60,7 @@ void Thermostat::fileSettingsChanged()
     qDebug() << "Read from: " << _settings_path;
 
     QList<QStringList> sett;
-    if (loadTimelineCfg(_settings_path, sett))
+    if (readCSVFile(_settings_path, sett))
     {
         for (int row = 0; row < sett.size(); row++)
         {
@@ -101,25 +101,30 @@ void Thermostat::pidControll()
 {
     QTime now = QTime::currentTime();
     _current_hour = now.hour();
-
     float sp = timeline_slots[_current_hour].tempSP;
     qDebug() << "pid " << sp;
 
-    float temp_dev  =  readDeviceTemperature();
-    float temp_sens =  readSensorTemperature();
-    float temp_ext  =  readSensorExtTemperature();
+    readSensData();
+    for (int i = 0; i < _sensors_data.size(); i++)
+    {
+        SensMap m = _sensors_data[i];
+
+        if (m.type == "intTemp" && m.data != _int_temp)
+            _int_temp = (_int_temp + m.data) / 2;
+
+        if (m.type == "extTemp" && m.data != _ext_temp)
+            _ext_temp = (_ext_temp + m.data) / 2;
+    }
+
+    _dev_temp = readDeviceTemperature();
+
+    qDebug() << "intTemp:" << _int_temp << "extTemp:" << _ext_temp;
+    qDebug() << "devTemp:" << _dev_temp;
 
     float processed_temp = 0.0;
-
-    qDebug() << "dev: " << temp_dev << "sen: " << temp_sens << "ext: " << temp_ext;
-
     bool onoff = false;
     if (processed_temp < sp)
         onoff = true;
-
-    _status = onoff;
-    _int_temp = (temp_dev + temp_sens) / 2;
-    _ext_temp = temp_ext;
 
     heaterOnOff(onoff);
 
@@ -129,27 +134,9 @@ void Thermostat::pidControll()
 void Thermostat::heaterOnOff(bool cmd)
 {
     qDebug() << "Heater " << cmd;
+    _status = cmd;
 }
 
-bool Thermostat::loadTimelineCfg(QString cfg, QList<QStringList> &l)
-{
-    QFile file(cfg);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << file.errorString();
-        return false;
-    }
-
-    while (!file.atEnd()) {
-        QByteArray line = file.readLine();
-        line = line.trimmed();
-        QString lline = QString::fromLocal8Bit(line);
-        l.append(lline.split(';'));
-        qDebug() << lline;
-    }
-    file.close();
-
-    return true;
-}
 
 float Thermostat::readDeviceTemperature()
 {
@@ -160,22 +147,36 @@ float Thermostat::readDeviceTemperature()
     return t.toFloat();
 }
 
-float Thermostat::readSensorExtTemperature()
+void Thermostat::readSensData()
 {
-    float temp = 0.0;
-    for (int i = 0; i < 12; i++) {
-        temp += (qrand() % ((22 + 1) - 18) + 18);
-    }
+    QList<QStringList> data;
+    if (readCSVFile(_input_root_path + "sensor_data.cfg", data))
+    {
+        for (int i = 0; i < data.size(); i++)
+        {
+            if (data[i].size() < 4) {
+                qDebug() << "Ext sens o enought elements to unpack.";
+                continue;
+            }
 
-    return temp / 12;
+            SensMap sens;
+            bool check = false;
+
+            sens.index = data[i][0].toInt(&check);
+            if (!check)
+                sens.index = -1;
+
+            sens.type = data[i][1];
+
+            sens.data = data[i][2].toFloat(&check);
+            if (!check) {
+                qDebug() << "Unable to convert data" << sens.data;
+                continue;
+            }
+
+            sens.desc = data[i][3];
+            _sensors_data.append(sens);
+        }
+    }
 }
 
-float Thermostat::readSensorTemperature()
-{
-    float temp = 0.0;
-    for (int i = 0; i < 12; i++) {
-        temp += (qrand() % ((22 + 1) - 18) + 18);
-    }
-
-    return temp / 12;
-}

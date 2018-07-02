@@ -6,6 +6,13 @@
 #include <QObject>
 #include <QVector>
 
+struct SensMap {
+    int index;
+    float data;
+    QString type;
+    QString desc;
+};
+
 class QFileSystemWatcher;
 
 class Thermostat : public QObject
@@ -33,8 +40,7 @@ private:
     bool loadTimelineCfg(QString cfg, QList<QStringList> &l);
 
     float readDeviceTemperature();
-    float readSensorTemperature();
-    float readSensorExtTemperature();
+    void readSensData();
 
     void heaterOnOff(bool cmd);
 
@@ -49,10 +55,13 @@ private:
 
     // Status of thermostatat
     int _status;
+    float _dev_temp;
     float _int_temp;
     float _ext_temp;
 
     QString _input_root_path;
+    QVector<SensMap> _sensors_data;
+
 };
 
 #endif // THERMOSTAT_H
