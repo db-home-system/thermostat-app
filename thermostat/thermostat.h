@@ -42,7 +42,7 @@ private:
     float readDeviceTemperature();
     void readSensData();
 
-    void heaterOnOff(bool cmd);
+    void heaterOnOff(int cmd);
 
     QFileSystemWatcher * const _watcher;
     QString _root_path;

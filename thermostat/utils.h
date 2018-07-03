@@ -7,11 +7,13 @@
 
 QString readLineFromFile(QString f);
 bool readCSVFile(QString f, QList<QStringList> &l);
+bool writeLineToFile(QString f, QString data);
 
 QString settingsRootPath();
 QString settingsPath();
 
 QString inputsRootPath();
+QString outputRootPath();
 
 bool isSimMode();
 QString simRootPath();

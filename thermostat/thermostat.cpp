@@ -33,22 +33,21 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
     connect(pid, &QTimer::timeout, this, &Thermostat::pidControll);
     pid->start(1000);
 
-    // Trigger first time the timeline setting configuration
-    QTimer::singleShot(100, this, &Thermostat::fileSettingsChanged);
-
     _status = 0;
     _int_temp = 0;
     _ext_temp = 0;
 
     // root path for all settings
-    _root_path = settingsRootPath();
-    _settings_path =  settingsPath();
     _input_root_path = inputsRootPath();
+
+    // Trigger first time the timeline setting configuration
+    QTimer::singleShot(100, this, &Thermostat::fileSettingsChanged);
 }
 
 void Thermostat::dirSettingsChanged()
 {
-    qDebug() << _root_path << _settings_path;
+    _root_path = settingsRootPath();
+    _settings_path =  settingsPath();
 
     _watcher->addPath(_root_path);
     _watcher->addPath(_settings_path);
@@ -102,7 +101,6 @@ void Thermostat::pidControll()
     QTime now = QTime::currentTime();
     _current_hour = now.hour();
     float sp = timeline_slots[_current_hour].tempSP;
-    qDebug() << "pid " << sp;
 
     readSensData();
     for (int i = 0; i < _sensors_data.size(); i++)
@@ -118,23 +116,42 @@ void Thermostat::pidControll()
 
     _dev_temp = readDeviceTemperature();
 
-    qDebug() << "intTemp:" << _int_temp << "extTemp:" << _ext_temp;
-    qDebug() << "devTemp:" << _dev_temp;
-
     float processed_temp = 0.0;
-    bool onoff = false;
+    int onoff = 0;
     if (processed_temp < sp)
-        onoff = true;
+        onoff = 1;
+
+    // Dump to file current pid data
+    QString outpid = "#h;devTemp;intTemp;extTemp;Sp;Pt;\n";
+    outpid += QString::number(_current_hour);
+    outpid += ";";
+    outpid += QString::number(_dev_temp);
+    outpid += ";";
+    outpid += QString::number(_int_temp);
+    outpid += ";";
+    outpid += QString::number(_ext_temp);
+    outpid += ";";
+    outpid += QString::number(sp);
+    outpid += ";";
+    outpid += QString::number(processed_temp);
+    outpid += ";";
+
+    QString out_file = outputRootPath() + "pid.cmd";
+    writeLineToFile(out_file, outpid);
 
     heaterOnOff(onoff);
 
     emit statusChanged();
 }
 
-void Thermostat::heaterOnOff(bool cmd)
+void Thermostat::heaterOnOff(int cmd)
 {
-    qDebug() << "Heater " << cmd;
-    _status = cmd;
+    QString out_file = outputRootPath() + "heater.cmd";
+    if (writeLineToFile(out_file, QString::number(cmd)))
+    {
+        qDebug() << "Heater " << cmd;
+        _status = cmd;
+    }
 }
 
 

@@ -25,6 +25,7 @@ QString settingsRootPath()
     if (!qroot_path.isEmpty())
         p = QString::fromLocal8Bit(qroot_path);
 
+    qDebug() << p;
     return p;
 }
 
@@ -35,6 +36,7 @@ QString settingsPath()
     if (!qsettings_path.isEmpty())
         p = QString::fromLocal8Bit(qsettings_path);
 
+    qDebug() << p;
     return p;
 }
 
@@ -46,6 +48,31 @@ QString inputsRootPath()
         p = QString::fromLocal8Bit(qroot_path);
 
     return p;
+}
+
+QString outputRootPath()
+{
+    QString p = "/var/lib/thermapp/input/";
+    QByteArray qroot_path = qgetenv("THERMAPP_OUTPUT_ROOT");
+    if (!qroot_path.isEmpty())
+        p = QString::fromLocal8Bit(qroot_path);
+
+    return p;
+}
+
+bool writeLineToFile(QString f, QString data)
+{
+    QFile file(f);
+    if (!file.open(QIODevice::WriteOnly)) {
+        qDebug() << file.errorString();
+        return false;
+    }
+
+    data += "\n";
+    file.write(data.toUtf8());
+    file.close();
+
+    return true;
 }
 
 
