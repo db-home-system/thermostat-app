@@ -7,7 +7,6 @@
 #include <QVector>
 
 struct SensMap {
-    int index;
     float data;
     QString type;
     QString desc;
@@ -29,12 +28,14 @@ public:
 public slots:
     void fileSettingsChanged();
     void dirSettingsChanged();
+    void updateHour(int h);
 
 signals:
     void dataChanged(QVector<TimelineSlotsData> &timeline);
     void statusChanged();
 
 private:
+    void dump(float sp, float processed_temp);
     void pidControll();
 
     bool loadTimelineCfg(QString cfg, QList<QStringList> &l);
@@ -60,7 +61,7 @@ private:
     float _ext_temp;
 
     QString _input_root_path;
-    QVector<SensMap> _sensors_data;
+    QMap<int, SensMap> _sensors_data;
 
 };
 

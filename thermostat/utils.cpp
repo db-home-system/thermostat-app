@@ -31,7 +31,7 @@ QString settingsRootPath()
 
 QString settingsPath()
 {
-    QString p = settingsRootPath() + "timeline.cfg";
+    QString p = settingsRootPath() + "timeline";
     QByteArray qsettings_path = qgetenv("THERAPP_TIMELINE_CFG");
     if (!qsettings_path.isEmpty())
         p = QString::fromLocal8Bit(qsettings_path);
@@ -108,7 +108,7 @@ bool readCSVFile(QString f, QList<QStringList> &l)
         line = line.trimmed();
         QString lline = QString::fromLocal8Bit(line);
         l.append(lline.split(';'));
-        qDebug() << lline;
+        //qDebug() << lline;
     }
     file.close();
 
@@ -128,7 +128,7 @@ QString simRootPath()
 
 QString simPath()
 {
-    QString p = simRootPath() + "time.cfg";
+    QString p = simRootPath() + "time";
     QByteArray qsettings_path = qgetenv("APP_SIM_TIME");
     if (!qsettings_path.isEmpty())
         p = QString::fromLocal8Bit(qsettings_path);

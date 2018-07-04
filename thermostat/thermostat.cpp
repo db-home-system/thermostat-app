@@ -2,12 +2,14 @@
 #include "manager.h"
 #include "thermostat.h"
 #include "utils.h"
+#include "manager.h"
 
 #include <QVector>
 #include <QTimer>
 #include <QFile>
 #include <QTime>
 #include <QFileSystemWatcher>
+#include <QtMath>
 
 #include <QtDebug>
 
@@ -28,20 +30,27 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
         timeline_slots[i].tempSP = 15.0;
     }
 
+    _current_hour = 0;
+
     // Register timer for pid controll
     QTimer *pid = new QTimer(this);
     connect(pid, &QTimer::timeout, this, &Thermostat::pidControll);
     pid->start(1000);
 
     _status = 0;
-    _int_temp = 0;
-    _ext_temp = 0;
+    _int_temp = -273.0;
+    _ext_temp = -273.0;
 
     // root path for all settings
     _input_root_path = inputsRootPath();
 
     // Trigger first time the timeline setting configuration
     QTimer::singleShot(100, this, &Thermostat::fileSettingsChanged);
+}
+
+void Thermostat::updateHour(int h)
+{
+    _current_hour = h;
 }
 
 void Thermostat::dirSettingsChanged()
@@ -95,34 +104,10 @@ void Thermostat::fileSettingsChanged()
         emit dataChanged(timeline_slots);
     }
 }
-
-void Thermostat::pidControll()
+void Thermostat::dump(float sp, float processed_temp)
 {
-    QTime now = QTime::currentTime();
-    _current_hour = now.hour();
-    float sp = timeline_slots[_current_hour].tempSP;
-
-    readSensData();
-    for (int i = 0; i < _sensors_data.size(); i++)
-    {
-        SensMap m = _sensors_data[i];
-
-        if (m.type == "intTemp" && m.data != _int_temp)
-            _int_temp = (_int_temp + m.data) / 2;
-
-        if (m.type == "extTemp" && m.data != _ext_temp)
-            _ext_temp = (_ext_temp + m.data) / 2;
-    }
-
-    _dev_temp = readDeviceTemperature();
-
-    float processed_temp = 0.0;
-    int onoff = 0;
-    if (processed_temp < sp)
-        onoff = 1;
-
     // Dump to file current pid data
-    QString outpid = "#h;devTemp;intTemp;extTemp;Sp;Pt;\n";
+    QString outpid = "#h;devTemp;intTemp;extTemp;Sp;Pt;Status;\n";
     outpid += QString::number(_current_hour);
     outpid += ";";
     outpid += QString::number(_dev_temp);
@@ -135,18 +120,68 @@ void Thermostat::pidControll()
     outpid += ";";
     outpid += QString::number(processed_temp);
     outpid += ";";
+    outpid += QString::number(_status);
+    outpid += ";";
 
-    QString out_file = outputRootPath() + "pid.cmd";
+    QString out_file = outputRootPath() + "pid.log";
     writeLineToFile(out_file, outpid);
+}
+
+void Thermostat::pidControll()
+{
+    float sp = timeline_slots[_current_hour].tempSP;
+
+    readSensData();
+
+    QMapIterator<int, SensMap> i(_sensors_data);
+     while (i.hasNext())
+     {
+         i.next();
+         SensMap m = i.value();
+
+        if (m.data == -273.0)
+            continue;
+
+        if (m.type == "intTemp" && m.data != _int_temp)
+        {
+            qDebug() << m.data << _int_temp;
+            if (_int_temp == -273.0)
+                _int_temp = m.data;
+            else
+                _int_temp = (_int_temp + m.data) / 2;
+        }
+
+        if (m.type == "extTemp" && m.data != _ext_temp)
+            if (_ext_temp == -273.0)
+                _ext_temp = m.data;
+            else
+                _ext_temp = (_ext_temp + m.data) / 2;
+    }
+
+    _dev_temp = readDeviceTemperature();
+
+    // Round with 2 decimal
+    _int_temp = static_cast<float>(static_cast<int>(_int_temp*100+0.5))/100.0;
+    _ext_temp = static_cast<float>(static_cast<int>(_ext_temp*100+0.5))/100.0;
+    _dev_temp = static_cast<float>(static_cast<int>(_dev_temp*100+0.5))/100.0;
+
+    float processed_temp = _dev_temp;
+    if (_int_temp != -273.0)
+        processed_temp = (_dev_temp + _int_temp) / 2;
+
+    int onoff = 0;
+    if ((sp - processed_temp) >= 0.5)
+        onoff = 1;
+
+    dump(sp, processed_temp);
 
     heaterOnOff(onoff);
-
     emit statusChanged();
 }
 
 void Thermostat::heaterOnOff(int cmd)
 {
-    QString out_file = outputRootPath() + "heater.cmd";
+    QString out_file = outputRootPath() + "heater";
     if (writeLineToFile(out_file, QString::number(cmd)))
     {
         qDebug() << "Heater " << cmd;
@@ -157,7 +192,7 @@ void Thermostat::heaterOnOff(int cmd)
 
 float Thermostat::readDeviceTemperature()
 {
-    QString t = readLineFromFile(_input_root_path + "device_temp.cfg");
+    QString t = readLineFromFile(_input_root_path + "device_temp");
     if (t == "")
         return -273.0;
 
@@ -167,7 +202,7 @@ float Thermostat::readDeviceTemperature()
 void Thermostat::readSensData()
 {
     QList<QStringList> data;
-    if (readCSVFile(_input_root_path + "sensor_data.cfg", data))
+    if (readCSVFile(_input_root_path + "sensor_data", data))
     {
         for (int i = 0; i < data.size(); i++)
         {
@@ -179,9 +214,9 @@ void Thermostat::readSensData()
             SensMap sens;
             bool check = false;
 
-            sens.index = data[i][0].toInt(&check);
+            int index = data[i][0].toInt(&check);
             if (!check)
-                sens.index = -1;
+                continue;
 
             sens.type = data[i][1];
 
@@ -192,7 +227,8 @@ void Thermostat::readSensData()
             }
 
             sens.desc = data[i][3];
-            _sensors_data.append(sens);
+
+            _sensors_data[index] = sens;
         }
     }
 }
