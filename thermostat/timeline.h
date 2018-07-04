@@ -19,10 +19,12 @@ private:
     QVector<TimelineSlotsData> time_slots;
 
     int _current_h;
+    int _thermo_status;
 
 public slots:
     void updateTimeline(QVector<TimelineSlotsData> &p);
     void updateTimelineMark(int h);
+    void updateThermoStatus(int status);
 };
 
 #endif // TIMELINE_H

@@ -47,9 +47,12 @@ QString Manager::extTemperature() const
     return QString::number(thermostat->extTemp(), 'f', 1);
 }
 
-int Manager::thermostatStatus() const
+QString Manager::thermostatStatus() const
 {
-   return thermostat->status();
+   if(thermostat->status() == 1)
+       return "ON";
+
+   return "OFF";
 }
 
 void Manager::internalClockTicks()
@@ -63,12 +66,10 @@ void Manager::internalClockTicks()
     // In simulation mode overwrite current time
     if (isSimMode())
     {
-        qDebug() << "Warning Simulation mode!";
         _diplay_clock = getSimTimeClock();
         QString h = _diplay_clock.split(":")[0];
         hour_clock = h.toInt();
     }
-
 
     if (hour_clock != _current_h)
     {
@@ -76,10 +77,16 @@ void Manager::internalClockTicks()
       if (_current_h > 23)
           _current_h = 0;
 
+      thermostat->updateHour(_current_h);
       emit currentHour(_current_h);
     }
 
     emit clockChanged();
+}
+
+void Manager::internalThermoStatus()
+{
+    emit currentStatus(thermostat->status());
 }
 
 void Manager::test()
@@ -91,6 +98,7 @@ Manager::Manager(QObject *parent) : QObject(parent),
 {
     // Timeline mark updater
     _current_h = 0;
+    _thermo_status = 0;
 
     int tick = 1000;
     if (isSimMode())
@@ -114,6 +122,9 @@ Manager::Manager(QObject *parent) : QObject(parent),
 
     connect(thermostat, &Thermostat::statusChanged,
                     this, &Manager::extTemperatureChanged);
+
+    connect(thermostat, &Thermostat::statusChanged,
+                    this, &Manager::internalThermoStatus);
 
     // Weather info signals
     connect(weather, &Weather::weatherChanged, this, &Manager::weatherInfo);

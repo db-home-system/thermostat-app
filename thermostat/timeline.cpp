@@ -40,9 +40,11 @@ Timeline::Timeline(QQuickItem *parent) :
     Manager *mgr_class = Manager::instance();
     connect(mgr_class, &Manager::timelineChanged, this, &Timeline::updateTimeline);
     connect(mgr_class, &Manager::currentHour, this, &Timeline::updateTimelineMark);
+    connect(mgr_class, &Manager::currentStatus, this, &Timeline::updateThermoStatus);
 
     // Timeline marker, show the current hour slot
     _current_h = 0;
+    _thermo_status = 0;
 }
 
 void Timeline::paint(QPainter *painter)
@@ -133,7 +135,12 @@ void Timeline::paint(QPainter *painter)
     QPainterPath fillmain;
     fillmain.arcMoveTo(rectMain, -60);
     fillmain.arcTo(rectMain, -60, 300);
-    painter->fillPath(fillmain, QBrush("#00ff33"));
+
+    QBrush bg = QBrush("#427df4");
+    if (_thermo_status == 1)
+        bg = QBrush("#f48342");
+
+    painter->fillPath(fillmain, bg);
 
     QPainterPath pathSun, pathMoon, pathMark;
     qreal startAngle = 240; //START_ANGLE;
@@ -210,6 +217,7 @@ void Timeline::updateTimeline(QVector<TimelineSlotsData> &p)
     time_slots.resize(p.size());
     for (int i = 0; i < p.size(); i++)
         time_slots[i].onOff = p.at(i).onOff;
+
     update();
 }
 
@@ -217,6 +225,10 @@ void Timeline::updateTimelineMark(int h)
 {
     if (_current_h != h)
         _current_h = h;
+}
 
-    update();
+void Timeline::updateThermoStatus(int status)
+{
+    if (_thermo_status != status)
+        _thermo_status = status;
 }
