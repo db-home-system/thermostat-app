@@ -22,6 +22,7 @@ import sys
 import os
 import time
 import unittest
+from thermo_sim import *
 
 class TestThermo(unittest.TestCase):
     """
@@ -39,68 +40,59 @@ class TestThermo(unittest.TestCase):
 
     def test_timelineMark(self):
         for i in range(24):
-            s = "%0.2d:00:00" % i
-            f = open("/tmp/sim/time", 'w')
-            f.write(s + "\n")
-            f.close()
-            print s
+            timeClock("%0.2d:00:00" % i)
             time.sleep(1.2)
 
     def test_timeline(self):
-        filename = "../settings/timeline" 
-        f = open(filename, 'w')
-        for i in range(24):
-            s = "%d;%d;0.0" % (i, 1)
-            f.write(s + "\n")
-        f.close()
 
+        def pattern(st):
+            flag = st
+            ll = []
+            for i in range(24):
+                ll.append("%d;%d;0" % (i, flag))
+                flag = not flag
+            return ll
+
+        l = [
+            [ "%d;1;0" % i for i in range(24) ],
+            [ "%d;0;0" % i for i in range(24) ],
+            pattern(True),
+            pattern(False),
+        ]
+
+        cleanUp()
         time.sleep(1)
 
-        f = open(filename, 'w')
-        for i in range(24):
-            s = "%d;%d;0.0" % (i, 0)
-            f.write(s + "\n")
-        f.close()
-
-        time.sleep(1)
-
-        f = open(filename, 'w')
-        flag = True
-        for i in range(24):
-            s = "%d;%d;0.0" % (i, flag)
-            f.write(s + "\n")
-            flag = not flag
-        f.close()
+        for x in l:
+            timeline(x)
+            time.sleep(1)
 
     def test_pid(self):
-        f = open("/tmp/sim/time", 'w')
-        f.write("06:00:00\n")
-        f.close()
 
-        f = open("../settings/timeline", 'w')
-        f.write("5;1;18.0\n")
-        f.write("6;1;25.0\n")
-        f.write("7;1;20.0\n")
-        f.close()
+        cleanUp()
+        time.sleep(1)
 
+        timeClock("06:00:00")
 
-        dev_temp = open("../input/device_temp", 'w')
-        dev_temp.write("20.13\n")
-        dev_temp.close()
+        l = [
+            "5;1;18.0",
+            "6;1;25.0",
+            "7;1;20.0",
+        ]
+        timeline(l)
+
+        devTemp("20.13")
 
         sens = [
             "0;intTemp;23.0;casa",
             "1;extTemp;19.13;finestra",
             "2;intTemp;27.0;finestra",
         ]
-        sens_temp = open("../input/sensor_data", 'w')
-        for i in sens:
-            sens_temp.write(i + "\n")
-        sens_temp.close()
+        sensTemp(sens)
 
         #h;devTemp;intTemp;extTemp;Sp;Pt;
         check = "6;20.13;25.67;19.13;25;22.9;0;\n"
-        pid = open("../output/pid.log", 'r')
+        pid = open("../output/pid.log", 'r').readlines()
         print
         for i in pid:
             if "#" in i:
@@ -124,8 +116,8 @@ if __name__ == "__main__":
 
     suite = unittest.TestSuite()
     #suite.addTest(TestThermo("test_timelineMark"))
-    #suite.addTest(TestThermo("test_timeline"))
-    suite.addTest(TestThermo("test_pid"))
+    suite.addTest(TestThermo("test_timeline"))
+    #suite.addTest(TestThermo("test_pid"))
     unittest.TextTestRunner(
         stream=sys.stdout,
         verbosity=options.verbose).run(suite)
