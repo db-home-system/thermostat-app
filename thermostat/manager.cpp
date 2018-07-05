@@ -57,8 +57,6 @@ QString Manager::thermostatStatus() const
 
 void Manager::internalClockTicks()
 {
-    qDebug() << "Ticks elapse";
-
     QTime timeclock = QTime::currentTime();
     _diplay_clock = timeclock.toString("hh:mm:ss");
     int hour_clock = timeclock.hour();

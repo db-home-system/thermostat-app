@@ -32,10 +32,14 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
 
     _current_hour = 0;
 
+    int tick = 1000;
+    if (isSimMode())
+        tick = simPIDTick();
+
     // Register timer for pid controll
     QTimer *pid = new QTimer(this);
     connect(pid, &QTimer::timeout, this, &Thermostat::pidControll);
-    pid->start(1000);
+    pid->start(tick);
 
     _status = 0;
     _int_temp = -273.0;
@@ -130,6 +134,7 @@ void Thermostat::dump(float sp, float processed_temp)
 void Thermostat::pidControll()
 {
     float sp = timeline_slots[_current_hour].tempSP;
+    //qDebug() << sp << _current_hour;
 
     readSensData();
 
@@ -144,7 +149,6 @@ void Thermostat::pidControll()
 
         if (m.type == "intTemp" && m.data != _int_temp)
         {
-            qDebug() << m.data << _int_temp;
             if (_int_temp == -273.0)
                 _int_temp = m.data;
             else
@@ -183,10 +187,7 @@ void Thermostat::heaterOnOff(int cmd)
 {
     QString out_file = outputRootPath() + "heater";
     if (writeLineToFile(out_file, QString::number(cmd)))
-    {
-        qDebug() << "Heater " << cmd;
         _status = cmd;
-    }
 }
 
 

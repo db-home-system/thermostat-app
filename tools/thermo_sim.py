@@ -11,7 +11,8 @@ def cleanUp():
     ]
 
     for i in f:
-        os.remove(i)
+        if os.path.exists(i):
+            os.remove(i)
 
 
 def timeline(l):
@@ -36,6 +37,15 @@ def sensTemp(sens):
         f.write(i + "\n")
     f.close()
 
+def readPID():
+    line = []
+    with open("../output/pid.log", 'r') as p:
+        for i in p:
+            if "#" in i:
+                continue
+            line = i.strip()
+
+    line = line.split(";")
 
 if __name__ == "__main__":
 

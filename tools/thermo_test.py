@@ -24,6 +24,8 @@ import time
 import unittest
 from thermo_sim import *
 
+TICK = 1 # second
+
 class TestThermo(unittest.TestCase):
     """
     Thermo test suite
@@ -90,6 +92,8 @@ class TestThermo(unittest.TestCase):
         ]
         sensTemp(sens)
 
+        time.sleep(2.2)
+
         #h;devTemp;intTemp;extTemp;Sp;Pt;
         check = "6;20.13;25.67;19.13;25;22.9;0;\n"
         pid = open("../output/pid.log", 'r').readlines()
@@ -99,6 +103,35 @@ class TestThermo(unittest.TestCase):
                 continue
             self.assertEqual(i,check)
 
+    def test_pidOnOff(self):
+
+        cleanUp()
+        time.sleep(1)
+
+        timeClock("00:00:00")
+
+        l = [
+            "5;1;18.0",
+            "6;1;25.0",
+            "7;1;20.0",
+        ]
+        timeline(l)
+
+        devTemp("20.0")
+        time.sleep(TICK * 2)
+
+
+        #h;devTemp;intTemp;extTemp;Sp;Pt;
+        check = [
+            "6;20.13;25.67;19.13;25;22.9;1;\n",
+        ]
+
+        timeClock("05:00:00")
+        print
+        for i in ["18.0", "18.3", "18.5"]:
+            devTemp(i)
+            print readPID()
+            time.sleep(TICK)
 
 
 if __name__ == "__main__":
@@ -116,8 +149,9 @@ if __name__ == "__main__":
 
     suite = unittest.TestSuite()
     #suite.addTest(TestThermo("test_timelineMark"))
-    suite.addTest(TestThermo("test_timeline"))
+    #suite.addTest(TestThermo("test_timeline"))
     #suite.addTest(TestThermo("test_pid"))
+    suite.addTest(TestThermo("test_pidOnOff"))
     unittest.TextTestRunner(
         stream=sys.stdout,
         verbosity=options.verbose).run(suite)

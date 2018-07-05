@@ -64,7 +64,7 @@ bool writeLineToFile(QString f, QString data)
 {
     QFile file(f);
     if (!file.open(QIODevice::WriteOnly)) {
-        qDebug() << file.errorString();
+        qDebug() << file.errorString() << f;
         return false;
     }
 
@@ -81,7 +81,7 @@ QString readLineFromFile(QString f)
     QString l = "";
     QFile file(f);
     if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << file.errorString();
+        //qDebug() << file.errorString() << f;
         return l;
     }
 
@@ -99,7 +99,7 @@ bool readCSVFile(QString f, QList<QStringList> &l)
 {
     QFile file(f);
     if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << file.errorString();
+        qDebug() << file.errorString() << f;
         return false;
     }
 
@@ -108,7 +108,6 @@ bool readCSVFile(QString f, QList<QStringList> &l)
         line = line.trimmed();
         QString lline = QString::fromLocal8Bit(line);
         l.append(lline.split(';'));
-        //qDebug() << lline;
     }
     file.close();
 
@@ -147,6 +146,19 @@ int simTick()
     }
 
     return p;
+}
+
+int simPIDTick()
+{
+    int p = 100;
+    QByteArray tick = qgetenv("APP_SIM_TICK");
+    if (!tick.isEmpty())
+    {
+        QString s = QString::fromLocal8Bit(tick);
+        p = s.toInt();
+    }
+
+    return p / 10;
 }
 
 QString getSimTimeClock()

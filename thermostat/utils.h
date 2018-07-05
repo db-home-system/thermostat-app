@@ -19,6 +19,7 @@ bool isSimMode();
 QString simRootPath();
 QString simPath();
 int simTick();
+int simPIDTick();
 QString getSimTimeClock();
 
 #endif // UTILS_H
