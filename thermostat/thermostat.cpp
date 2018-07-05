@@ -13,6 +13,8 @@
 
 #include <QtDebug>
 
+#define NOTEMP -273000 // mdegCelsius
+
 Thermostat::Thermostat(QObject *parent) : QObject(parent),
     _watcher(new QFileSystemWatcher(this))
 {
@@ -42,8 +44,8 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
     pid->start(tick);
 
     _status = 0;
-    _int_temp = -273.0;
-    _ext_temp = -273.0;
+    _int_temp = NOTEMP;
+    _ext_temp = NOTEMP;
 
     // root path for all settings
     _input_root_path = inputsRootPath();
@@ -108,7 +110,7 @@ void Thermostat::fileSettingsChanged()
         emit dataChanged(timeline_slots);
     }
 }
-void Thermostat::dump(float sp, float processed_temp)
+void Thermostat::dump(float sp)
 {
     // Dump to file current pid data
     QString outpid = "#h;devTemp;intTemp;extTemp;Sp;Pt;Status;\n";
@@ -122,7 +124,7 @@ void Thermostat::dump(float sp, float processed_temp)
     outpid += ";";
     outpid += QString::number(sp);
     outpid += ";";
-    outpid += QString::number(processed_temp);
+    outpid += QString::number(_processed_temp);
     outpid += ";";
     outpid += QString::number(_status);
     outpid += ";";
@@ -141,43 +143,49 @@ void Thermostat::pidControll()
     QMapIterator<int, SensMap> i(_sensors_data);
      while (i.hasNext())
      {
+         qDebug() << "map";
          i.next();
          SensMap m = i.value();
 
-        if (m.data == -273.0)
+        if (m.data == NOTEMP)
             continue;
 
         if (m.type == "intTemp" && m.data != _int_temp)
         {
-            if (_int_temp == -273.0)
+            if (_int_temp == NOTEMP)
+            {
                 _int_temp = m.data;
+            }
             else
+            {
                 _int_temp = (_int_temp + m.data) / 2;
+            }
         }
 
         if (m.type == "extTemp" && m.data != _ext_temp)
-            if (_ext_temp == -273.0)
+        {
+            if (_ext_temp == NOTEMP)
+            {
                 _ext_temp = m.data;
+            }
             else
+            {
                 _ext_temp = (_ext_temp + m.data) / 2;
+            }
+        }
     }
 
     _dev_temp = readDeviceTemperature();
 
-    // Round with 2 decimal
-    _int_temp = static_cast<float>(static_cast<int>(_int_temp*100+0.5))/100.0;
-    _ext_temp = static_cast<float>(static_cast<int>(_ext_temp*100+0.5))/100.0;
-    _dev_temp = static_cast<float>(static_cast<int>(_dev_temp*100+0.5))/100.0;
-
-    float processed_temp = _dev_temp;
-    if (_int_temp != -273.0)
-        processed_temp = (_dev_temp + _int_temp) / 2;
+    _processed_temp = _dev_temp;
+    if (_int_temp != NOTEMP)
+        _processed_temp = (_dev_temp + _int_temp) / 2;
 
     int onoff = 0;
-    if ((sp - processed_temp) >= 0.5)
+    if ((sp - _processed_temp) >= 5)
         onoff = 1;
 
-    dump(sp, processed_temp);
+    dump(sp);
 
     heaterOnOff(onoff);
     emit statusChanged();
@@ -191,13 +199,21 @@ void Thermostat::heaterOnOff(int cmd)
 }
 
 
-float Thermostat::readDeviceTemperature()
+int Thermostat::readDeviceTemperature()
 {
     QString t = readLineFromFile(_input_root_path + "device_temp");
     if (t == "")
-        return -273.0;
+        return NOTEMP;
 
-    return t.toFloat();
+    bool ok = false;
+    float d = t.toFloat(&ok);
+    if (!ok)
+    {
+        qDebug() << "Unable to convert data" << t;
+        return NOTEMP;
+    }
+
+    return static_cast<int>(d * 1000);
 }
 
 void Thermostat::readSensData()
@@ -212,8 +228,9 @@ void Thermostat::readSensData()
                 continue;
             }
 
-            SensMap sens;
             bool check = false;
+            SensMap sens;
+            sens.data = NOTEMP;
 
             int index = data[i][0].toInt(&check);
             if (!check)
@@ -221,12 +238,14 @@ void Thermostat::readSensData()
 
             sens.type = data[i][1];
 
-            sens.data = data[i][2].toFloat(&check);
+            float d = data[i][2].toFloat(&check);
             if (!check) {
                 qDebug() << "Unable to convert data" << sens.data;
                 continue;
             }
 
+            // Convert in mdegCelsius
+            sens.data = static_cast<int>(d * 1000);
             sens.desc = data[i][3];
 
             _sensors_data[index] = sens;

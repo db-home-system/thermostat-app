@@ -7,7 +7,7 @@
 #include <QVector>
 
 struct SensMap {
-    float data;
+    int data;
     QString type;
     QString desc;
 };
@@ -21,9 +21,9 @@ class Thermostat : public QObject
 public:
     explicit Thermostat(QObject *parent = nullptr);
 
-    int status()    { return _status;   }
-    float intTemp() { return _int_temp; }
-    float extTemp() { return _ext_temp; }
+    int status()    const { return static_cast<float>(_status)/1000;   }
+    float intTemp() const { return static_cast<float>(_processed_temp)/1000; }
+    float extTemp() const { return static_cast<float>(_ext_temp)/1000; }
 
 public slots:
     void fileSettingsChanged();
@@ -35,12 +35,12 @@ signals:
     void statusChanged();
 
 private:
-    void dump(float sp, float processed_temp);
+    void dump(float sp);
     void pidControll();
 
     bool loadTimelineCfg(QString cfg, QList<QStringList> &l);
 
-    float readDeviceTemperature();
+    int readDeviceTemperature();
     void readSensData();
 
     void heaterOnOff(int cmd);
@@ -56,9 +56,10 @@ private:
 
     // Status of thermostatat
     int _status;
-    float _dev_temp;
-    float _int_temp;
-    float _ext_temp;
+    int _dev_temp;
+    int _int_temp;
+    int _ext_temp;
+    int _processed_temp;
 
     QString _input_root_path;
     QMap<int, SensMap> _sensors_data;
