@@ -13,7 +13,6 @@
 
 #include <QtDebug>
 
-#define NOTEMP -273000 // mdegCelsius
 
 Thermostat::Thermostat(QObject *parent) : QObject(parent),
     _watcher(new QFileSystemWatcher(this))
@@ -99,7 +98,7 @@ void Thermostat::fileSettingsChanged()
 
             check = false;
             float slot_temp = sett[row][2].toFloat(&check);
-            if ((slot_temp > 40.0 || slot_temp < 0.0) || !(check)) {
+            if ((slot_temp > 40000 || slot_temp < 0) || !(check)) {
                 qDebug() << "Invalid temperature." << slot_temp;
                 continue;
             }
@@ -143,7 +142,6 @@ void Thermostat::pidControll()
     QMapIterator<int, SensMap> i(_sensors_data);
      while (i.hasNext())
      {
-         qDebug() << "map";
          i.next();
          SensMap m = i.value();
 
@@ -206,14 +204,14 @@ int Thermostat::readDeviceTemperature()
         return NOTEMP;
 
     bool ok = false;
-    float d = t.toFloat(&ok);
+    int d = t.toInt(&ok);
     if (!ok)
     {
         qDebug() << "Unable to convert data" << t;
         return NOTEMP;
     }
 
-    return static_cast<int>(d * 1000);
+    return d; //static_cast<int>(d * 1000);
 }
 
 void Thermostat::readSensData()

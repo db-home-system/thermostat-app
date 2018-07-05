@@ -21,9 +21,9 @@ class Thermostat : public QObject
 public:
     explicit Thermostat(QObject *parent = nullptr);
 
-    int status()    const { return static_cast<float>(_status)/1000;   }
-    float intTemp() const { return static_cast<float>(_processed_temp)/1000; }
-    float extTemp() const { return static_cast<float>(_ext_temp)/1000; }
+    int status()  const { return _status;         }
+    int intTemp() const { return _processed_temp; }
+    int extTemp() const { return _ext_temp;       }
 
 public slots:
     void fileSettingsChanged();

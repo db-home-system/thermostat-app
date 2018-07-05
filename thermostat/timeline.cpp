@@ -45,6 +45,8 @@ Timeline::Timeline(QQuickItem *parent) :
     // Timeline marker, show the current hour slot
     _current_h = 0;
     _thermo_status = 0;
+
+    time_slots = QVector<TimelineSlotsData>(TIMELINE_DIVISION, {0, 15000});
 }
 
 void Timeline::paint(QPainter *painter)
@@ -225,10 +227,12 @@ void Timeline::updateTimelineMark(int h)
 {
     if (_current_h != h)
         _current_h = h;
+    update();
 }
 
 void Timeline::updateThermoStatus(int status)
 {
     if (_thermo_status != status)
         _thermo_status = status;
+    update();
 }

@@ -38,14 +38,13 @@ def sensTemp(sens):
     f.close()
 
 def readPID():
-    line = []
     with open("../output/pid.log", 'r') as p:
         for i in p:
             if "#" in i:
                 continue
-            line = i.strip()
+            l = i.strip()
 
-    line = line.split(";")
+    return l.split(";")
 
 if __name__ == "__main__":
 

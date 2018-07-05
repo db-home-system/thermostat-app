@@ -13,7 +13,7 @@ class QNetworkReply;
 
 struct TimelineSlotsData {
     int  onOff;
-    float tempSP;
+    int tempSP;
 };
 
 

@@ -81,7 +81,7 @@ QString readLineFromFile(QString f)
     QString l = "";
     QFile file(f);
     if (!file.open(QIODevice::ReadOnly)) {
-        //qDebug() << file.errorString() << f;
+        qDebug() << file.errorString() << f;
         return l;
     }
 
@@ -99,7 +99,7 @@ bool readCSVFile(QString f, QList<QStringList> &l)
 {
     QFile file(f);
     if (!file.open(QIODevice::ReadOnly)) {
-        qDebug() << file.errorString() << f;
+        //qDebug() << file.errorString() << f;
         return false;
     }
 

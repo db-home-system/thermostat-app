@@ -1,3 +1,4 @@
+#include "app-config.h"
 #include "manager.h"
 #include "thermostat.h"
 #include "weather.h"
@@ -39,12 +40,26 @@ QString Manager::displayClock() const
 
 QString Manager::intTemperature() const
 {
-    return QString::number(thermostat->intTemp(), 'f', 1);
+    QString temp = "No Temp";
+    if (thermostat->intTemp() != NOTEMP)
+    {
+        temp = QString::number(thermostat->intTemp() / 1000);
+        temp += ",";
+        temp += QString::number((thermostat->intTemp()/100) % 10);
+    }
+    return temp;
 }
 
 QString Manager::extTemperature() const
 {
-    return QString::number(thermostat->extTemp(), 'f', 1);
+    QString temp = "No Temp";
+    if (thermostat->extTemp() != NOTEMP)
+    {
+        temp = QString::number(thermostat->extTemp() / 1000);
+        temp += ",";
+        temp += QString::number((thermostat->extTemp() / 10) % 100);
+    }
+    return temp;
 }
 
 QString Manager::thermostatStatus() const

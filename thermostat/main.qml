@@ -11,7 +11,7 @@ Window {
     Item {
         id: manager
         property string intTemperature: Manager.intTemperature
-        property double extTemperature: Manager.extTemperature
+        property string extTemperature: Manager.extTemperature
         property string thermostatStatus: Manager.thermostatStatus
         property string displayClock: Manager.displayClock
         property string tempo: Manager.tempo

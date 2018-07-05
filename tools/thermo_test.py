@@ -77,18 +77,18 @@ class TestThermo(unittest.TestCase):
         timeClock("06:00:00")
 
         l = [
-            "5;1;18.0",
-            "6;1;25.0",
-            "7;1;20.0",
+            "5;1;18000",
+            "6;1;25000",
+            "7;1;20000",
         ]
         timeline(l)
 
         devTemp("20.13")
 
         sens = [
-            "0;intTemp;23.0;casa",
-            "1;extTemp;19.13;finestra",
-            "2;intTemp;27.0;finestra",
+            "0;intTemp;23000;casa",
+            "1;extTemp;19130;finestra",
+            "2;intTemp;27000;finestra",
         ]
         sensTemp(sens)
 
@@ -111,13 +111,13 @@ class TestThermo(unittest.TestCase):
         timeClock("00:00:00")
 
         l = [
-            "5;1;18.0",
-            "6;1;25.0",
-            "7;1;20.0",
+            "5;1;18000",
+            "6;1;25000",
+            "7;1;20000",
         ]
         timeline(l)
 
-        devTemp("20.0")
+        devTemp("20000")
         time.sleep(TICK * 2)
 
 
@@ -128,7 +128,7 @@ class TestThermo(unittest.TestCase):
 
         timeClock("05:00:00")
         print
-        for i in ["18.0", "18.3", "18.5"]:
+        for i in ["18000", "18300", "18500"]:
             devTemp(i)
             print readPID()
             time.sleep(TICK)
