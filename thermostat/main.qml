@@ -39,15 +39,12 @@ Window {
             anchors.centerIn: parent
             font.pointSize: 24
             anchors.verticalCenterOffset: -32
-            anchors.horizontalCenterOffset: 0
             text : "<b>" + manager.intTemperature + "</b>"
         }
 
         Text {
             anchors.centerIn: parent
             font.pointSize: 22
-            anchors.verticalCenterOffset: 0
-            anchors.horizontalCenterOffset: 0
             text : manager.extTemperature
         }
 
@@ -57,9 +54,7 @@ Window {
             font.pointSize: 17
             text: manager.displayClock
             anchors.verticalCenterOffset: 32
-            anchors.horizontalCenterOffset: 0
-            color: 'grey'
-            opacity: 0.7
+            color: "#364922"
         }
 
         Text {
