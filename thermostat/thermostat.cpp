@@ -51,6 +51,12 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
 
     // Trigger first time the timeline setting configuration
     QTimer::singleShot(100, this, &Thermostat::fileSettingsChanged);
+
+
+    _sens_type_map = {
+        {"intTemp", INT_TEMP},
+        {"extTemp", EXT_TEMP},
+    };
 }
 
 void Thermostat::updateHour(int h)
@@ -148,7 +154,7 @@ void Thermostat::pidControll()
         if (m.data == NOTEMP)
             continue;
 
-        if (m.type == "intTemp" && m.data != _int_temp)
+        if (m.type == INT_TEMP && m.data != _int_temp)
         {
             if (_int_temp == NOTEMP)
             {
@@ -160,7 +166,7 @@ void Thermostat::pidControll()
             }
         }
 
-        if (m.type == "extTemp" && m.data != _ext_temp)
+        if (m.type == EXT_TEMP && m.data != _ext_temp)
         {
             if (_ext_temp == NOTEMP)
             {
@@ -200,7 +206,7 @@ void Thermostat::heaterOnOff(int cmd)
 int Thermostat::readDeviceTemperature()
 {
     QString t = readLineFromFile(_input_root_path + "device_temp");
-    if (t == "")
+    if (t.isNull())
         return NOTEMP;
 
     bool ok = false;
@@ -234,7 +240,7 @@ void Thermostat::readSensData()
             if (!check)
                 continue;
 
-            sens.type = data[i][1];
+            sens.type = _sens_type_map.value(data[i][1], ERR_TYPE);
 
             float d = data[i][2].toFloat(&check);
             if (!check) {

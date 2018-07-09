@@ -6,12 +6,6 @@
 #include <QObject>
 #include <QVector>
 
-struct SensMap {
-    int data;
-    QString type;
-    QString desc;
-};
-
 class QFileSystemWatcher;
 
 class Thermostat : public QObject
@@ -35,6 +29,21 @@ signals:
     void statusChanged();
 
 private:
+    enum SensTypes {
+        INT_TEMP,
+        EXT_TEMP,
+
+        ERR_TYPE
+    };
+
+    struct SensMap {
+        int data;
+        SensTypes type;
+        QString desc;
+    };
+
+    QMap<QString, SensTypes> _sens_type_map;
+
     void dump(float sp);
     void pidControll();
 
