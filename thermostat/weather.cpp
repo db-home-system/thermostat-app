@@ -31,7 +31,7 @@ void Weather::getInfo(QNetworkReply *s)
     QJsonObject obj = itemDoc.object();
 
     QJsonValue lfTemp = obj.value("list").toArray()[0].toObject()["temp"];
-    double temp = lfTemp["day"].toDouble();
+    double temp = lfTemp.toObject().value("day").toDouble();
 
     if (_temp != temp)
     {
@@ -40,7 +40,7 @@ void Weather::getInfo(QNetworkReply *s)
     }
 
     QJsonValue lfIcon = obj.value("list").toArray()[0].toObject().value("weather").toArray()[0];
-    QString icon = lfIcon["icon"].toString();
+    QString icon = lfIcon.toObject().value("icon").toString();
     if ((icon != _icon) && (icon != ""))
     {
         _icon = icon;
