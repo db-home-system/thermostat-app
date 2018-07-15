@@ -1,0 +1,56 @@
+#ifndef APPCONFIG_H
+#define APPCONFIG_H
+
+#include <QObject>
+#include <QMap>
+
+// Timeline cfg
+#define TIMELINE_DIVISION       24
+#define NOTEMP -273000 // mdegCelsius
+
+#define DEFAULT_PID_TICK     1000 // millisecons
+#define DEFAULT_CLOCK_TICK   1000 // millisecons
+
+class QSettings;
+
+class AppConfig : public QObject
+{
+    Q_OBJECT
+
+public:
+    enum AppModeType {
+        TEST,
+
+        MODE_ERR
+    };
+
+    QMap<QString, AppModeType> _appmode_map;
+    static AppConfig *instance(QObject *parent = nullptr);
+
+    QString timelineFile();
+    QString tempDevice();
+    QString sensorDevice();
+    QString pidOutFile();
+    QString statusFile();
+    QString modeFile();
+    QString runDir()     const { return _root_run_path; }
+    QString settingDir() const { return _root_setting_path; }
+
+    AppModeType appMode();
+    QString getSimTimeClock();
+    int simTick();
+    int simPIDTick();
+
+signals:
+
+public slots:
+
+private:
+    AppConfig(QObject *parent = nullptr);
+
+    QSettings *_cfg;
+    QString _root_run_path;
+    QString _root_setting_path;
+};
+
+#endif // APPCONFIG_H

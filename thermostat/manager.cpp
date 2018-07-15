@@ -1,8 +1,9 @@
-#include "app-config.h"
+#include "appconfig.h"
 #include "manager.h"
 #include "thermostat.h"
 #include "weather.h"
 #include "utils.h"
+#include "appconfig.h"
 
 #include <QFile>
 #include <QTimer>
@@ -74,15 +75,16 @@ void Manager::internalClockTicks()
 {
     QTime timeclock = QTime::currentTime();
     _diplay_clock = timeclock.toString("hh:mm:ss");
-    int hour_clock = timeclock.hour();
 
-    // In simulation mode overwrite current time
-    if (isSimMode())
+    int tick = DEFAULT_CLOCK_TICK;
+    if (_cfg->appMode() == AppConfig::TEST)
     {
-        _diplay_clock = getSimTimeClock();
-        QString h = _diplay_clock.split(":")[0];
-        hour_clock = h.toInt();
+        _diplay_clock = _cfg->getSimTimeClock();
+        tick = _cfg->simTick();
     }
+
+    int hour_clock = _diplay_clock.split(":")[0].toInt();
+    _clock_tick->setInterval(tick);
 
     if (hour_clock != _current_h)
     {
@@ -113,15 +115,11 @@ Manager::Manager(QObject *parent) : QObject(parent),
     _current_h = 0;
     _thermo_status = 0;
 
-    int tick = 1000;
-    if (isSimMode())
-        tick = simTick();
-
     // Timer for clock display
-    timer = new QTimer(this);
-    timer->setInterval(tick);
-    timer->start();
-    connect(timer, &QTimer::timeout, this, &Manager::internalClockTicks);
+    _clock_tick = new QTimer(this);
+    _clock_tick->setInterval(DEFAULT_CLOCK_TICK);
+    _clock_tick->start();
+    connect(_clock_tick, &QTimer::timeout, this, &Manager::internalClockTicks);
 
     // Signal to manage timeline and temperature
     connect(thermostat, &Thermostat::dataChanged,
@@ -142,4 +140,5 @@ Manager::Manager(QObject *parent) : QObject(parent),
     // Weather info signals
     connect(weather, &Weather::weatherChanged, this, &Manager::weatherInfo);
 
+    _cfg = AppConfig::instance();
 }

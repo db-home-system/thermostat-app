@@ -1,6 +1,9 @@
 #ifndef MANAGER_H
 #define MANAGER_H
 
+#include "utils.h"
+#include "appconfig.h"
+
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QUrl>
@@ -36,7 +39,7 @@ class Manager : public QObject
 private:
     explicit Manager(QObject *parent = nullptr);
 
-    QTimer * timer;
+    QTimer *_clock_tick;
     Thermostat * const thermostat;
     Weather *const weather;
 
@@ -46,6 +49,8 @@ private:
     QString _diplay_clock;
     void internalClockTicks();
     void internalThermoStatus();
+
+    AppConfig *_cfg;
 
 public:
     static Manager *instance(QObject *parent = nullptr);

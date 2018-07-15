@@ -7,6 +7,8 @@
 #include <QVector>
 
 class QFileSystemWatcher;
+class AppConfig;
+class QTimer;
 
 class Thermostat : public QObject
 {
@@ -55,10 +57,6 @@ private:
     void heaterOnOff(int cmd);
 
     QFileSystemWatcher * const _watcher;
-    QString _root_path;
-    QString _settings_path;
-
-
     QVector<TimelineSlotsData> timeline_slots;
 
     int _current_hour;
@@ -70,8 +68,10 @@ private:
     int _ext_temp;
     int _processed_temp;
 
-    QString _input_root_path;
     QMap<int, SensMap> _sensors_data;
+
+    AppConfig *_cfg;
+    QTimer *_pid_timer;
 
 };
 

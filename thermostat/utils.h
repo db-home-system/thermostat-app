@@ -1,9 +1,11 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <QObject>
 #include <QString>
 #include <QList>
 #include <QStringList>
+
 
 QString readLineFromFile(QString f);
 bool readCSVFile(QString f, QList<QStringList> &l);

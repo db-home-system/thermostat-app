@@ -28,6 +28,13 @@ Window {
             fillMode: Image.PreserveAspectFit
         }
 
+        Image{
+            source: "file://Users/asterix/Desktop/shot.jpg"
+            anchors.top: parent.Center
+            width: 480; height: 272
+            fillMode: Image.PreserveAspectFit
+        }
+
         Timeline {
             id: timeline
             anchors.centerIn: parent

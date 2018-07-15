@@ -1,4 +1,4 @@
-#include "app-config.h"
+#include "appconfig.h"
 #include "timeline.h"
 #include "manager.h"
 

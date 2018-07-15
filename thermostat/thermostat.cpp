@@ -1,4 +1,4 @@
-#include "app-config.h"
+#include "appconfig.h"
 #include "manager.h"
 #include "thermostat.h"
 #include "utils.h"
@@ -10,6 +10,7 @@
 #include <QTime>
 #include <QFileSystemWatcher>
 #include <QtMath>
+#include <QFileInfo>
 
 #include <QtDebug>
 
@@ -17,13 +18,15 @@
 Thermostat::Thermostat(QObject *parent) : QObject(parent),
     _watcher(new QFileSystemWatcher(this))
 {
+    // Load configuration
+    _cfg = AppConfig::instance();
 
     connect(_watcher, &QFileSystemWatcher::fileChanged,
-                      this, &Thermostat::fileSettingsChanged);
+            this, &Thermostat::fileSettingsChanged);
     connect(_watcher, &QFileSystemWatcher::directoryChanged,
-                      this, &Thermostat::dirSettingsChanged);
+            this, &Thermostat::dirSettingsChanged);
 
-    dirSettingsChanged();
+
     // Set correct size for timelines slots.
     timeline_slots.resize(TIMELINE_DIVISION);
     for (int i = 0; i < TIMELINE_DIVISION; i++) {
@@ -33,30 +36,23 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
 
     _current_hour = 0;
 
-    int tick = 1000;
-    if (isSimMode())
-        tick = simPIDTick();
-
     // Register timer for pid controll
-    QTimer *pid = new QTimer(this);
-    connect(pid, &QTimer::timeout, this, &Thermostat::pidControll);
-    pid->start(tick);
+    _pid_timer = new QTimer(this);
+    connect(_pid_timer, &QTimer::timeout, this, &Thermostat::pidControll);
+    _pid_timer->start(DEFAULT_PID_TICK);
 
     _status = 0;
     _int_temp = NOTEMP;
     _ext_temp = NOTEMP;
 
-    // root path for all settings
-    _input_root_path = inputsRootPath();
-
-    // Trigger first time the timeline setting configuration
-    QTimer::singleShot(100, this, &Thermostat::fileSettingsChanged);
-
-
     _sens_type_map = {
         {"intTemp", INT_TEMP},
         {"extTemp", EXT_TEMP},
     };
+
+    // Trigger first time the timeline setting configuration
+    QTimer::singleShot(100, this, &Thermostat::dirSettingsChanged);
+    QTimer::singleShot(100, this, &Thermostat::fileSettingsChanged);
 }
 
 void Thermostat::updateHour(int h)
@@ -66,20 +62,15 @@ void Thermostat::updateHour(int h)
 
 void Thermostat::dirSettingsChanged()
 {
-    _root_path = settingsRootPath();
-    _settings_path =  settingsPath();
-
-    _watcher->addPath(_root_path);
-    _watcher->addPath(_settings_path);
-    qDebug() << _watcher->files() << _watcher->directories();
+    _watcher->addPath(_cfg->settingDir());
+    _watcher->addPath(_cfg->timelineFile());
+    qDebug() << "settings" << _watcher->files() << _watcher->directories();
 }
 
 void Thermostat::fileSettingsChanged()
 {
-    qDebug() << "Read from: " << _settings_path;
-
     QList<QStringList> sett;
-    if (readCSVFile(_settings_path, sett))
+    if (readCSVFile(_cfg->timelineFile(), sett))
     {
         for (int row = 0; row < sett.size(); row++)
         {
@@ -134,22 +125,20 @@ void Thermostat::dump(float sp)
     outpid += QString::number(_status);
     outpid += ";";
 
-    QString out_file = outputRootPath() + "pid.log";
-    writeLineToFile(out_file, outpid);
+    writeLineToFile(_cfg->pidOutFile(), outpid);
 }
 
 void Thermostat::pidControll()
 {
     float sp = timeline_slots[_current_hour].tempSP;
-    //qDebug() << sp << _current_hour;
 
     readSensData();
 
     QMapIterator<int, SensMap> i(_sensors_data);
-     while (i.hasNext())
-     {
-         i.next();
-         SensMap m = i.value();
+    while (i.hasNext())
+    {
+        i.next();
+        SensMap m = i.value();
 
         if (m.data == NOTEMP)
             continue;
@@ -192,20 +181,26 @@ void Thermostat::pidControll()
     dump(sp);
 
     heaterOnOff(onoff);
+
+    int tick = 0;
+    if (_cfg->appMode() == AppConfig::TEST)
+        tick = _cfg->simPIDTick();
+
+    _pid_timer->setInterval(tick);
+
     emit statusChanged();
 }
 
 void Thermostat::heaterOnOff(int cmd)
 {
-    QString out_file = outputRootPath() + "heater";
-    if (writeLineToFile(out_file, QString::number(cmd)))
+    if (writeLineToFile(_cfg->statusFile(), QString::number(cmd)))
         _status = cmd;
 }
 
 
 int Thermostat::readDeviceTemperature()
 {
-    QString t = readLineFromFile(_input_root_path + "device_temp");
+    QString t = readLineFromFile(_cfg->tempDevice());
     if (t.isNull())
         return NOTEMP;
 
@@ -223,7 +218,7 @@ int Thermostat::readDeviceTemperature()
 void Thermostat::readSensData()
 {
     QList<QStringList> data;
-    if (readCSVFile(_input_root_path + "sensor_data", data))
+    if (readCSVFile(_cfg->sensorDevice(), data))
     {
         for (int i = 0; i < data.size(); i++)
         {
