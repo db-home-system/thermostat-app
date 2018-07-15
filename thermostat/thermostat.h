@@ -42,6 +42,7 @@ private:
         int data;
         SensTypes type;
         QString desc;
+        bool update;
     };
 
     QMap<QString, SensTypes> _sens_type_map;

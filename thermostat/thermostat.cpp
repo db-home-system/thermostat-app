@@ -135,6 +135,10 @@ void Thermostat::pidControll()
     readSensData();
 
     QMapIterator<int, SensMap> i(_sensors_data);
+    int avg_ext = NOTEMP;
+    int avg_int = NOTEMP;
+    int c_ext = 0;
+    int c_int = 0;
     while (i.hasNext())
     {
         i.next();
@@ -143,32 +147,38 @@ void Thermostat::pidControll()
         if (m.data == NOTEMP)
             continue;
 
-        if (m.type == INT_TEMP && m.data != _int_temp)
+        if (m.type == INT_TEMP && m.update)
         {
-            if (_int_temp == NOTEMP)
-            {
-                _int_temp = m.data;
-            }
-            else
-            {
-                _int_temp = (_int_temp + m.data) / 2;
-            }
+            if (avg_int == NOTEMP)
+                avg_int = 0;
+
+            avg_int += m.data;
+            c_int++;
+            m.update = false;
         }
 
-        if (m.type == EXT_TEMP && m.data != _ext_temp)
+        if (m.type == EXT_TEMP && m.update)
         {
-            if (_ext_temp == NOTEMP)
-            {
-                _ext_temp = m.data;
-            }
-            else
-            {
-                _ext_temp = (_ext_temp + m.data) / 2;
-            }
+            if (avg_ext == NOTEMP)
+                avg_ext = 0;
+
+            avg_ext += m.data;
+            c_ext++;
+            m.update = false;
         }
     }
 
+    if (c_ext == 0)
+        c_ext = 1;
+
+    if (c_int == 0)
+        c_int = 1;
+
+    _ext_temp = avg_ext/c_ext;
+    _int_temp = avg_int/c_int;
     _dev_temp = readDeviceTemperature();
+
+//    qDebug() << _ext_temp << _int_temp << _dev_temp;
 
     _processed_temp = _dev_temp;
     if (_int_temp != NOTEMP)
@@ -230,6 +240,7 @@ void Thermostat::readSensData()
             bool check = false;
             SensMap sens;
             sens.data = NOTEMP;
+            sens.update = false;
 
             int index = data[i][0].toInt(&check);
             if (!check)
@@ -246,6 +257,7 @@ void Thermostat::readSensData()
             // Convert in mdegCelsius
             sens.data = static_cast<int>(d * 1000);
             sens.desc = data[i][3];
+            sens.update = true;
 
             _sensors_data[index] = sens;
         }
