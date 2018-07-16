@@ -32,7 +32,7 @@ AppConfig::AppModeType AppConfig::appMode()
     if (ll.isNull() || ll.isEmpty())
         return MODE_ERR;
 
-    return _appmode_map.value("error", MODE_ERR);
+    return _appmode_map.value(ll, MODE_ERR);
 }
 
 QString AppConfig::getSimTimeClock()
