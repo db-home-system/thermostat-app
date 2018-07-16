@@ -65,6 +65,7 @@ class TestThermo(unittest.TestCase):
         ]
 
         cleanUp()
+        setMode("test")
         time.sleep(1)
 
         for x in l:
@@ -150,8 +151,8 @@ if __name__ == "__main__":
     print args
 
     suite = unittest.TestSuite()
-    suite.addTest(TestThermo("test_timelineMark"))
-    #suite.addTest(TestThermo("test_timeline"))
+    #suite.addTest(TestThermo("test_timelineMark"))
+    suite.addTest(TestThermo("test_timeline"))
     #suite.addTest(TestThermo("test_pid"))
     #suite.addTest(TestThermo("test_pidOnOff"))
     unittest.TextTestRunner(

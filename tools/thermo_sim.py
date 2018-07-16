@@ -19,7 +19,7 @@ def cleanUp():
 
 
 def timeline(l):
-    f = open("../settings/timeline" , 'w')
+    f = open("../thermoapp/setting/timeline.in" , 'w')
     for i in l:
         f.write(i + "\n")
     f.close()
