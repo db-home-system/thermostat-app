@@ -41,8 +41,10 @@ class TestThermo(unittest.TestCase):
         pass
 
     def test_timelineMark(self):
+        setMode("test")
         for i in range(24):
             timeClock("%0.2d:00:00" % i)
+            print i
             time.sleep(1.2)
 
     def test_timeline(self):
@@ -148,10 +150,10 @@ if __name__ == "__main__":
     print args
 
     suite = unittest.TestSuite()
-    #suite.addTest(TestThermo("test_timelineMark"))
+    suite.addTest(TestThermo("test_timelineMark"))
     #suite.addTest(TestThermo("test_timeline"))
     #suite.addTest(TestThermo("test_pid"))
-    suite.addTest(TestThermo("test_pidOnOff"))
+    #suite.addTest(TestThermo("test_pidOnOff"))
     unittest.TextTestRunner(
         stream=sys.stdout,
         verbosity=options.verbose).run(suite)

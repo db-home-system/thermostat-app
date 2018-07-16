@@ -1,18 +1,21 @@
 import time
 import os
 
-def cleanUp():
-    f = [
-        "../settings/timeline",
-        "/tmp/sim/time",
-        "../input/device_temp",
-        "../input/sensor_data",
-        "../output/pid.log"
-    ]
 
-    for i in f:
-        if os.path.exists(i):
-            os.remove(i)
+ROOT_SET_PATH="../thermoapp/setting/"
+ROOT_RUN_PATH="../thermoapp/run/"
+
+run_files = [
+    "mode.in",
+    "pid.out",
+    "status.out",
+    "clock.in"
+]
+
+def cleanUp():
+    for i in run_files:
+        if os.path.exists(os.path.join(ROOT_RUN_PATH, i)):
+            os.remove(os.path.join(ROOT_RUN_PATH, i))
 
 
 def timeline(l):
@@ -21,8 +24,13 @@ def timeline(l):
         f.write(i + "\n")
     f.close()
 
+def setMode(t):
+    f = open(ROOT_RUN_PATH + "mode.in", 'w')
+    f.write(t + "\n")
+    f.close()
+
 def timeClock(t):
-    f = open("/tmp/sim/time", 'w')
+    f = open(ROOT_RUN_PATH + "clock.in", 'w')
     f.write(t + "\n")
     f.close()
 
