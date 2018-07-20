@@ -21,5 +21,7 @@
         <file>images/icons/11n.svg</file>
         <file>images/icons/13n.svg</file>
         <file>images/icons/50n.svg</file>
+        <file>Home.qml</file>
+        <file>Settings.qml</file>
     </qresource>
 </RCC>
