@@ -35,6 +35,7 @@ public:
     QString modeFile();
     QString runDir()     const { return _root_run_path; }
     QString settingDir() const { return _root_setting_path; }
+    QString inputDir()   const { return _root_intput_path; }
 
     AppModeType appMode();
     QString getSimTimeClock();
@@ -51,6 +52,7 @@ private:
     QSettings *_cfg;
     QString _root_run_path;
     QString _root_setting_path;
+    QString _root_intput_path;
 };
 
 #endif // APPCONFIG_H

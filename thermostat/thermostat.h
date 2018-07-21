@@ -53,11 +53,14 @@ private:
     bool loadTimelineCfg(QString cfg, QList<QStringList> &l);
 
     int readDeviceTemperature();
+
     void readSensData();
+    void inputSensDataDirChanged();
 
     void heaterOnOff(int cmd);
 
     QFileSystemWatcher * const _watcher;
+    QFileSystemWatcher * const _watcher_sensors;
     QVector<TimelineSlotsData> timeline_slots;
 
     int _current_hour;

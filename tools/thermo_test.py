@@ -75,7 +75,7 @@ class TestThermo(unittest.TestCase):
     def test_pid(self):
 
         cleanUp()
-        time.sleep(1)
+        setMode("test")
 
         timeClock("06:00:00")
 
@@ -83,10 +83,11 @@ class TestThermo(unittest.TestCase):
             "5;1;18000",
             "6;1;25000",
             "7;1;20000",
+            "8;0;15000",
         ]
         timeline(l)
 
-        devTemp("20.13")
+        devTemp("20130")
 
         sens = [
             "0;intTemp;23000;casa",
@@ -95,47 +96,114 @@ class TestThermo(unittest.TestCase):
         ]
         sensTemp(sens)
 
-        time.sleep(2.2)
+        time.sleep(1.2)
 
-        #h;devTemp;intTemp;extTemp;Sp;Pt;
-        check = "6;20.13;25.67;19.13;25;22.9;0;\n"
-        pid = open("../output/pid.log", 'r').readlines()
-        print
-        for i in pid:
-            if "#" in i:
-                continue
-            self.assertEqual(i,check)
+        #h;devTemp;intTemp;extTemp;Sp;Pt;status;
+        check = ["6","20130","25000","19130","25000","22565","1",""]
+        pid = readPID()
+        print pid
+        self.assertEqual(pid, check)
+
+        timeClock("08:00:00")
+        time.sleep(1.2)
+
+        #h;devTemp;intTemp;extTemp;Sp;Pt;status;
+        check = ["8","20130","25000","19130","15000","22565","0",""]
+        pid = readPID()
+        print pid
+        self.assertEqual(pid, check)
 
     def test_pidOnOff(self):
 
-        cleanUp()
-        time.sleep(1)
 
-        timeClock("00:00:00")
+        DATA = [
+            {
+                "timeline": [
+                    "5;0;18000",
+                    "6;1;25000",
+                    "7;1;20000",
+                    "8;0;15000",
+                    "22;1;22000",
+                    "23;0;15000",
+                ],
 
-        l = [
-            "5;1;18000",
-            "6;1;25000",
-            "7;1;20000",
+                "data": [
+                    {
+                        "clock": "05:00:00", "temp": "18000",
+                        "sens": [ ],
+                        "clean": [ ],
+                        "check": ['5', '18000', '-273000', '-273000', '18000', '18000', '0', '']
+                    }, {
+                        "clock": "06:00:00", "temp": "24000",
+                        "sens":  [ "0;intTemp;22000;casa", "2;intTemp;19000;finestra", ],
+                        "clean": [ "0;intTemp;-273000;;", "2;intTemp;-273000;;", ],
+                        "check": [ "6","24000","20500","-273000","25000","22250","1","", ]
+                    }, {
+                        "clock": "07:00:00", "temp": "20130",
+                        "sens":  [ "1;extTemp;19130;f1 a", "2;extTemp;27000;f2 b", "5;extTemp;10000;f3 c"],
+                        "clean": [ "1;extTemp;-273000;f1 a",
+                                  "2;extTemp;-273000;f2 b", "5;extTemp;-273000;f3 c"],
+                        "check": [
+                            "7","20130","-273000","18710","20000","20130","0","", ]
+                    }, {
+                        "clock": "08:00:00", "temp": "20130",
+                        "sens":  [ "0;intTemp;17000;casa", "1;extTemp;11000;finestra", "2;intTemp;18000;finestra", ],
+                        "clean": [ "0;intTemp;-273000;casa",
+                                  "1;extTemp;-273000;finestra",
+                                  "2;intTemp;-273000;finestra", ],
+                        "check": [
+                            "8","20130","17500","11000","15000","18815","0","", ]
+                    }, {
+                        "clock": "23:00:00", "temp": "19000",
+                        "sens":  [ "0;intTemp;17000;casa", "1;extTemp;20000;finestra", "2;intTemp;18000;finestra", ],
+                        "clean": [ "0;intTemp;-273000;casa",
+                                   "1;extTemp;-273000;finestra",
+                                   "2;intTemp;-273000;finestra", ],
+                        "check": [
+                            "23","19000","17500","20000","15000","18250","0","", ]
+                    }, {
+                        "clock": "00:00:00", "temp": "18000",
+                        "sens":  ["0;intTemp; 0;casa",
+                                  "2;intTemp;-15000;finestra",
+                                  "1;extTemp;-10000;finestra",
+                                  "7;extTemp;-10000;finestra", ],
+                        "clean": ["0;intTemp;-273000;casa",
+                                  "2;intTemp;-273000;finestra",
+                                  "1;extTemp;-273000;finestra",
+                                  "7;extTemp;-273000;finestra", ],
+                        "check": [
+                            "0","18000","-7500","-10000","15000","5525","0","", ]
+                    }
+                    #h;devTemp;intTemp;extTemp;Sp;Pt;status;
+                ]
+            }
         ]
-        timeline(l)
 
-        devTemp("20000")
-        time.sleep(TICK * 2)
+        def resetStatus():
+            cleanData()
+            cleanPid()
+            devTemp("-27300")
 
-
-        #h;devTemp;intTemp;extTemp;Sp;Pt;
-        check = [
-            "6;20.13;25.67;19.13;25;22.9;1;\n",
-        ]
-
-        timeClock("05:00:00")
         print
-        for i in ["18000", "18300", "18500"]:
-            devTemp(i)
-            print readPID()
-            time.sleep(TICK)
+        for sim in DATA:
+            cleanUp()
+            setMode("test")
+            timeline(sim["timeline"])
 
+            for data in sim["data"]:
+                resetStatus()
+                timeClock(data["clock"])
+                devTemp(data["temp"])
+                sensTemp(data["sens"])
+                print "Clk:%s; Temp:%s; Sens:%s;" % (data["clock"], data["temp"], data["sens"])
+                sys.stdout.flush()
+                time.sleep(1.2)
+
+                pid = readPID()
+                sensTemp(data["clean"])
+                time.sleep(1.2)
+                print pid
+                self.assertEqual(pid, data["check"])
 
 if __name__ == "__main__":
     from optparse import OptionParser
@@ -152,9 +220,9 @@ if __name__ == "__main__":
 
     suite = unittest.TestSuite()
     #suite.addTest(TestThermo("test_timelineMark"))
-    suite.addTest(TestThermo("test_timeline"))
+    #suite.addTest(TestThermo("test_timeline"))
     #suite.addTest(TestThermo("test_pid"))
-    #suite.addTest(TestThermo("test_pidOnOff"))
+    suite.addTest(TestThermo("test_pidOnOff"))
     unittest.TextTestRunner(
         stream=sys.stdout,
         verbosity=options.verbose).run(suite)

@@ -12,10 +12,31 @@ run_files = [
     "clock.in"
 ]
 
+DEV_TEMP="/Users/asterix/src/dbhome-app/thermoapp/input/temp"
+SENS_DATA="/Users/asterix/src/dbhome-app/thermoapp/input/sens"
+
 def cleanUp():
+    cleanRun()
+    cleanTimeline()
+    cleanData()
+
+def cleanRun():
     for i in run_files:
         if os.path.exists(os.path.join(ROOT_RUN_PATH, i)):
             os.remove(os.path.join(ROOT_RUN_PATH, i))
+def cleanPid():
+    if os.path.exists(os.path.join(ROOT_RUN_PATH, "pid.out")):
+        os.remove(os.path.join(ROOT_RUN_PATH, "pid.out"))
+
+def cleanTimeline():
+    for i in ['timeline.in']:
+        if os.path.exists(os.path.join(ROOT_SET_PATH, i)):
+            os.remove(os.path.join(ROOT_SET_PATH, i))
+
+def cleanData():
+    for i in [DEV_TEMP, SENS_DATA]:
+        if os.path.exists(i):
+            os.remove(i)
 
 
 def timeline(l):
@@ -35,18 +56,18 @@ def timeClock(t):
     f.close()
 
 def devTemp(t):
-    f = open("../input/device_temp", 'w')
+    f = open(DEV_TEMP, 'w')
     f.write(t + "\n")
     f.close()
 
 def sensTemp(sens):
-    f = open("../input/sensor_data", 'w')
+    f = open(SENS_DATA, 'w')
     for i in sens:
         f.write(i + "\n")
     f.close()
 
 def readPID():
-    with open("../output/pid.log", 'r') as p:
+    with open(os.path.join(ROOT_RUN_PATH, "pid.out"), 'r') as p:
         for i in p:
             if "#" in i:
                 continue

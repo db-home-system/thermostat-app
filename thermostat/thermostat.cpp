@@ -16,16 +16,21 @@
 
 
 Thermostat::Thermostat(QObject *parent) : QObject(parent),
-    _watcher(new QFileSystemWatcher(this))
+    _watcher(new QFileSystemWatcher(this)),
+    _watcher_sensors(new QFileSystemWatcher(this))
 {
     // Load configuration
     _cfg = AppConfig::instance();
 
-    connect(_watcher, &QFileSystemWatcher::fileChanged,
-            this, &Thermostat::fileSettingsChanged);
     connect(_watcher, &QFileSystemWatcher::directoryChanged,
             this, &Thermostat::dirSettingsChanged);
+    connect(_watcher, &QFileSystemWatcher::fileChanged,
+            this, &Thermostat::fileSettingsChanged);
 
+    connect(_watcher_sensors, &QFileSystemWatcher::fileChanged,
+            this, &Thermostat::readSensData);
+    connect(_watcher_sensors, &QFileSystemWatcher::directoryChanged,
+            this, &Thermostat::inputSensDataDirChanged);
 
     // Set correct size for timelines slots.
     timeline_slots.resize(TIMELINE_DIVISION);
@@ -53,6 +58,8 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
     // Trigger first time the timeline setting configuration
     QTimer::singleShot(100, this, &Thermostat::dirSettingsChanged);
     QTimer::singleShot(100, this, &Thermostat::fileSettingsChanged);
+    QTimer::singleShot(100, this, &Thermostat::inputSensDataDirChanged);
+    QTimer::singleShot(100, this, &Thermostat::readSensData);
 }
 
 void Thermostat::updateHour(int h)
@@ -60,10 +67,19 @@ void Thermostat::updateHour(int h)
     _current_hour = h;
 }
 
+void Thermostat::inputSensDataDirChanged()
+{
+    _watcher_sensors->addPath(_cfg->inputDir());
+    _watcher_sensors->addPath(_cfg->sensorDevice());
+
+    qDebug() << "Input" << _watcher_sensors->files() << _watcher_sensors->directories();
+}
+
 void Thermostat::dirSettingsChanged()
 {
     _watcher->addPath(_cfg->settingDir());
     _watcher->addPath(_cfg->timelineFile());
+
     qDebug() << "settings" << _watcher->files() << _watcher->directories();
 }
 
@@ -130,9 +146,6 @@ void Thermostat::dump(float sp)
 
 void Thermostat::pidControll()
 {
-
-    readSensData();
-
     QMapIterator<int, SensMap> i(_sensors_data);
     int avg_ext = NOTEMP;
     int avg_int = NOTEMP;
@@ -250,7 +263,7 @@ void Thermostat::readSensData()
 
             sens.type = _sens_type_map.value(data[i][1], ERR_TYPE);
 
-            float d = data[i][2].toFloat(&check);
+            float d = data[i][2].toInt(&check);
             if (!check) {
                 qDebug() << "Unable to convert data" << sens.data;
                 continue;

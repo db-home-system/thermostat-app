@@ -16,8 +16,9 @@
 #define DEFAULT_SETTING_DIR  "/var/lib/thermoapp/settings/"
 #define DEFAULT_TIMELINE     "timeline.in"
 
-#define DEFAULT_TEMP      "/var/lib/thermoapp/input/onboard_temp"
-#define DEFAULT_SENS      "/var/lib/thermoapp/input/sensor_data"
+#define DEFAULT_INPUT_DIR  "/var/lib/thermoapp/input/"
+#define DEFAULT_TEMP       "onboard_temp.log"
+#define DEFAULT_SENS       "sensor_data.log"
 
 AppConfig::AppModeType AppConfig::appMode()
 {
@@ -29,8 +30,12 @@ AppConfig::AppModeType AppConfig::appMode()
 
     QByteArray m = _cfg->value("mode_file", DEFAULT_MODE).toByteArray();
     QString ll = readLineFromFile(QDir(_root_run_path).filePath(m));
+
     if (ll.isNull() || ll.isEmpty())
+    {
+        qDebug() << "Unable to get MODE!";
         return MODE_ERR;
+    }
 
     return _appmode_map.value(ll, MODE_ERR);
 }
@@ -67,13 +72,15 @@ QString AppConfig::timelineFile()
 QString AppConfig::tempDevice()
 {
     QByteArray s = _cfg->value("onboard_temp", DEFAULT_TEMP).toByteArray();
-    return s;
+    QString p = QDir(_root_intput_path).filePath(QString::fromLocal8Bit(s));
+    return p;
 }
 
 QString AppConfig::sensorDevice()
 {
     QByteArray s = _cfg->value("sensor_input", DEFAULT_SENS).toByteArray();
-    return QString::fromLocal8Bit(s);
+    QString p = QDir(_root_intput_path).filePath(QString::fromLocal8Bit(s));
+    return p;
 }
 
 QString AppConfig::pidOutFile()
@@ -109,11 +116,15 @@ AppConfig::AppConfig(QObject *parent) : QObject(parent)
     QByteArray m = _cfg->value("run_directory", DEFAULT_RUN_DIR).toByteArray();
     _root_run_path = QString::fromLocal8Bit(m);
 
-     m = _cfg->value("setting_directory", DEFAULT_SETTING_DIR).toByteArray();
+    m = _cfg->value("setting_directory", DEFAULT_SETTING_DIR).toByteArray();
     _root_setting_path = QString::fromLocal8Bit(m);
+
+    m = _cfg->value("input_directory", DEFAULT_SETTING_DIR).toByteArray();
+    _root_intput_path = QString::fromLocal8Bit(m);
 
     qDebug() << _root_run_path;
     qDebug() << _root_setting_path;
+    qDebug() << _root_intput_path;
 
     _appmode_map = {
         {"test",          TEST},
