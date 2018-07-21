@@ -130,7 +130,6 @@ void Thermostat::dump(float sp)
 
 void Thermostat::pidControll()
 {
-    float sp = timeline_slots[_current_hour].tempSP;
 
     readSensData();
 
@@ -184,12 +183,15 @@ void Thermostat::pidControll()
     if (_int_temp != NOTEMP)
         _processed_temp = (_dev_temp + _int_temp) / 2;
 
+    int sp = timeline_slots[_current_hour].tempSP;
     int onoff = 0;
-    if ((sp - _processed_temp) >= 5)
-        onoff = 1;
+    if (timeline_slots[_current_hour].onOff)
+    {
+      if (_processed_temp < sp)
+          onoff = 1;
+    }
 
     dump(sp);
-
     heaterOnOff(onoff);
 
     int tick = 0;
@@ -255,7 +257,7 @@ void Thermostat::readSensData()
             }
 
             // Convert in mdegCelsius
-            sens.data = static_cast<int>(d * 1000);
+            sens.data = d; //static_cast<int>(d * 1000);
             sens.desc = data[i][3];
             sens.update = true;
 
