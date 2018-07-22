@@ -46,7 +46,9 @@ Timeline::Timeline(QQuickItem *parent) :
     _current_h = 0;
     _thermo_status = 0;
 
-    time_slots = QVector<TimelineSlotsData>(TIMELINE_DIVISION, {0, 15000});
+    time_slots.resize(TIMELINE_DIVISION);
+    for (int i = 0; i < TIMELINE_DIVISION; i++)
+        time_slots[i] = {i, DEFAULT_TIMELINE_LOWTEMP};
 }
 
 void Timeline::paint(QPainter *painter)

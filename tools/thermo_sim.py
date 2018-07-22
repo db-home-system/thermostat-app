@@ -66,6 +66,20 @@ def sensTemp(sens):
         f.write(i + "\n")
     f.close()
 
+
+def cfgTick(cfg):
+    with open(cfg, r) as f:
+        pid_tick = 250
+        clock_tick = 1000
+        for line in f:
+            if "pid_tick" in line:
+                pid_tick = int(line.split("=")[1].strip())
+            if "clock_tick" in line:
+                clock_tick = int(line.split("=")[1].strip())
+
+    return (pid_tick, clock_tick)
+
+
 def readPID():
     with open(os.path.join(ROOT_RUN_PATH, "pid.out"), 'r') as p:
         for i in p:

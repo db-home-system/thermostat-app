@@ -5,8 +5,9 @@
 #include <QMap>
 
 // Timeline cfg
-#define TIMELINE_DIVISION       24
-#define NOTEMP -273000 // mdegCelsius
+#define TIMELINE_DIVISION         24
+#define NOTEMP                    -273000      // mdegCelsius
+#define DEFAULT_TIMELINE_LOWTEMP  10000        // mdegCelsius
 
 #define DEFAULT_PID_TICK     1000 // millisecons
 #define DEFAULT_CLOCK_TICK   1000 // millisecons

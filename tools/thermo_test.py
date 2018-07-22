@@ -24,7 +24,7 @@ import time
 import unittest
 from thermo_sim import *
 
-TICK = 1 # second
+CLOCK_TICK=1 # Sec
 
 class TestThermo(unittest.TestCase):
     """
@@ -45,7 +45,7 @@ class TestThermo(unittest.TestCase):
         for i in range(24):
             timeClock("%0.2d:00:00" % i)
             print i
-            time.sleep(1.2)
+            time.sleep(CLOCK_TICK * 1.1)
 
     def test_timeline(self):
 
@@ -105,7 +105,7 @@ class TestThermo(unittest.TestCase):
         self.assertEqual(pid, check)
 
         timeClock("08:00:00")
-        time.sleep(1.2)
+        time.sleep(CLOCK_TICK * 1.1)
 
         #h;devTemp;intTemp;extTemp;Sp;Pt;status;
         check = ["8","20130","25000","19130","15000","22565","0",""]
@@ -114,7 +114,6 @@ class TestThermo(unittest.TestCase):
         self.assertEqual(pid, check)
 
     def test_pidOnOff(self):
-
 
         DATA = [
             {
@@ -154,25 +153,25 @@ class TestThermo(unittest.TestCase):
                         "check": [
                             "8","20130","17500","11000","15000","18815","0","", ]
                     }, {
-                        "clock": "23:00:00", "temp": "19000",
+                        "clock": "22:00:00", "temp": "19000",
                         "sens":  [ "0;intTemp;17000;casa", "1;extTemp;20000;finestra", "2;intTemp;18000;finestra", ],
-                        "clean": [ "0;intTemp;-273000;casa",
-                                   "1;extTemp;-273000;finestra",
-                                   "2;intTemp;-273000;finestra", ],
+                        "clean": [ "0;intTemp;-273000;;",
+                                   "1;extTemp;-273000;;",
+                                   "2;intTemp;-273000;;", ],
                         "check": [
-                            "23","19000","17500","20000","15000","18250","0","", ]
+                            "22","19000","17500","20000","22000","18250","1","", ]
                     }, {
-                        "clock": "00:00:00", "temp": "18000",
+                        "clock": "23:00:00", "temp": "18000",
                         "sens":  ["0;intTemp; 0;casa",
                                   "2;intTemp;-15000;finestra",
                                   "1;extTemp;-10000;finestra",
                                   "7;extTemp;-10000;finestra", ],
-                        "clean": ["0;intTemp;-273000;casa",
-                                  "2;intTemp;-273000;finestra",
-                                  "1;extTemp;-273000;finestra",
-                                  "7;extTemp;-273000;finestra", ],
+                        "clean": ["0;intTemp;-273000;;",
+                                  "2;intTemp;-273000;;",
+                                  "1;extTemp;-273000;;",
+                                  "7;extTemp;-273000;;", ],
                         "check": [
-                            "0","18000","-7500","-10000","15000","5525","0","", ]
+                            "23","18000","-7500","-10000","15000","5250","0","", ]
                     }
                     #h;devTemp;intTemp;extTemp;Sp;Pt;status;
                 ]
@@ -197,11 +196,11 @@ class TestThermo(unittest.TestCase):
                 sensTemp(data["sens"])
                 print "Clk:%s; Temp:%s; Sens:%s;" % (data["clock"], data["temp"], data["sens"])
                 sys.stdout.flush()
-                time.sleep(1.2)
+                time.sleep(CLOCK_TICK * 1.1)
 
                 pid = readPID()
                 sensTemp(data["clean"])
-                time.sleep(1.2)
+                time.sleep(CLOCK_TICK * 1.1)
                 print pid
                 self.assertEqual(pid, data["check"])
 

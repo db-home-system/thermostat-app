@@ -36,7 +36,7 @@ Thermostat::Thermostat(QObject *parent) : QObject(parent),
     timeline_slots.resize(TIMELINE_DIVISION);
     for (int i = 0; i < TIMELINE_DIVISION; i++) {
         timeline_slots[i].onOff = 0;
-        timeline_slots[i].tempSP = 15.0;
+        timeline_slots[i].tempSP = DEFAULT_TIMELINE_LOWTEMP;
     }
 
     _current_hour = 0;
@@ -190,7 +190,7 @@ void Thermostat::pidControll()
     _int_temp = avg_int/c_int;
     _dev_temp = readDeviceTemperature();
 
-//    qDebug() << _ext_temp << _int_temp << _dev_temp;
+//    qDebug() << _ext_temp << _int_temp << _dev_temp << avg_ext << c_ext << avg_int << c_int;
 
     _processed_temp = _dev_temp;
     if (_int_temp != NOTEMP)
