@@ -2,17 +2,20 @@
 #define MANAGER_H
 
 #include "utils.h"
+#include "weather.h"
 #include "appconfig.h"
 
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QUrl>
+#include <QVariantList>
 
 class QTimer;
 class Thermostat;
 class Weather;
 class QNetworkAccessManager;
 class QNetworkReply;
+struct WeatherData;
 
 struct TimelineSlotsData {
     int  onOff;
@@ -33,8 +36,7 @@ class Manager : public QObject
     Q_PROPERTY(QString displayClock READ displayClock NOTIFY clockChanged)
 
     // Weather property
-    Q_PROPERTY(QString tempo READ tempo NOTIFY weatherInfo)
-    Q_PROPERTY(QString icon READ icon NOTIFY weatherInfo)
+    Q_PROPERTY(QVariantList weatherData READ weatherData NOTIFY weatherInfo)
 
 private:
     explicit Manager(QObject *parent = nullptr);
@@ -61,9 +63,7 @@ public:
     QString thermostatStatus() const;
 
     QString displayClock() const;
-    QString tempo() const;
-    QString icon() const;
-
+    QVariantList weatherData() const;
 
 signals:
     void clockChanged();

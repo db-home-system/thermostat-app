@@ -7,6 +7,9 @@
 // Timeline cfg
 #define TIMELINE_DIVISION         24
 #define NOTEMP                    -273000      // mdegCelsius
+#define NOPRESSURE                -1
+#define NOHUMIDITY                -1
+#define NOICON                    "images/icons/00d.svg"
 #define DEFAULT_TIMELINE_LOWTEMP  10000        // mdegCelsius
 
 #define DEFAULT_PID_TICK     1000 // millisecons
@@ -42,6 +45,9 @@ public:
     QString getSimTimeClock();
     int simTick();
     int simPIDTick();
+    QString owmToken();
+    QString owmURL();
+    QString owmPlace();
 
 signals:
 

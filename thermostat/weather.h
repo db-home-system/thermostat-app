@@ -1,28 +1,57 @@
 #ifndef WEATHER_H
 #define WEATHER_H
+
+#include "appconfig.h"
+
 #include <QObject>
+
 class QTimer;
+class QTime;
 class QNetworkAccessManager;
 class QNetworkReply;
+class AppConfig;
+
+struct WeatherData {
+    Q_GADGET
+public:
+    int temp;
+    int temp_max;
+    int temp_min;
+    int pressure;
+    int humidity;
+    QString icon;
+
+    Q_PROPERTY(int temp MEMBER temp)
+    Q_PROPERTY(int temp_max MEMBER temp_max)
+    Q_PROPERTY(int temp_min MEMBER temp_min)
+    Q_PROPERTY(int pressure MEMBER pressure)
+    Q_PROPERTY(int humidity MEMBER humidity)
+    Q_PROPERTY(QString icon MEMBER icon)
+};
+
+Q_DECLARE_METATYPE(WeatherData)
+
 class Weather : public QObject
 {
     Q_OBJECT
 public:
     explicit Weather(QObject *parent = nullptr);
 
-    double getTemp()   { return _temp; }
-    QString getWIcon() { return _icon; }
+    double temp()   { return _temp;     }
+    QVariantList data();
 
 private:
-    QString _icon = "00d";
-    double _temp = 0.0;
+    int _temp;
 
     QNetworkAccessManager *const netMgr;
-    void getInfo(QNetworkReply *s);
-    void getWeather();
+    void nowRead(QNetworkReply *s);
+    void nowQuery();
+
+    AppConfig *_cfg;
+    QMap<QString, WeatherData> _data;
 
 signals:
-    void weatherChanged();
+    void weatherNowChanged();
 };
 
 #endif // WEATHER_H

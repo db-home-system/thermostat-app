@@ -72,7 +72,7 @@ void Thermostat::inputSensDataDirChanged()
     _watcher_sensors->addPath(_cfg->inputDir());
     _watcher_sensors->addPath(_cfg->sensorDevice());
 
-    qDebug() << "Input" << _watcher_sensors->files() << _watcher_sensors->directories();
+//    qDebug() << "Input" << _watcher_sensors->files() << _watcher_sensors->directories();
 }
 
 void Thermostat::dirSettingsChanged()
@@ -80,7 +80,7 @@ void Thermostat::dirSettingsChanged()
     _watcher->addPath(_cfg->settingDir());
     _watcher->addPath(_cfg->timelineFile());
 
-    qDebug() << "settings" << _watcher->files() << _watcher->directories();
+//    qDebug() << "settings" << _watcher->files() << _watcher->directories();
 }
 
 void Thermostat::fileSettingsChanged()

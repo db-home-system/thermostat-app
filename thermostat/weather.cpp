@@ -8,45 +8,119 @@
 #include <QJsonArray>
 
 Weather::Weather(QObject *parent) : QObject(parent),
-  netMgr(new QNetworkAccessManager(this))
+    netMgr(new QNetworkAccessManager(this))
 {
+    _cfg = AppConfig::instance();
+
+    _data["now"] =     { NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON };
+    _data["next6h"] =  { NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON };
+    _data["next12h"] = { NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON };
+
+    _temp = NOTEMP;
+
     QTimer *timer = new QTimer(this);
     timer->setInterval(5000);
     timer->start();
 
-    connect(timer, &QTimer::timeout, this, &Weather::getWeather);
-
+    connect(timer, &QTimer::timeout, this, &Weather::nowQuery);
 }
 
-void Weather::getWeather()
+QVariantList Weather::data()
 {
-    netMgr->get(QNetworkRequest(QUrl("http://api.openweathermap.org/data/2.5/forecast/daily?id=4062577&units=metric&appid=8f3edecd56bac0612c3c92a1b177d306")));
-    connect(netMgr, &QNetworkAccessManager::finished, this, &Weather::getInfo);
+   QVariantList d;
+
+   d.append(QVariant::fromValue(_data["now"]));
+   d.append(QVariant::fromValue(_data["next6h"]));
+   d.append(QVariant::fromValue(_data["next12h"]));
+
+   return d;
 }
 
-void Weather::getInfo(QNetworkReply *s)
+void Weather::nowQuery()
 {
-    bool flag = false;
-    QJsonDocument itemDoc = QJsonDocument::fromJson(s->readAll());
+    if (_cfg->owmURL().isEmpty() ||
+            _cfg->owmPlace().isEmpty() ||
+            _cfg->owmToken().isEmpty())
+    {
+        qDebug() << "Invalid url for open weather.";
+        return;
+    }
+
+    QString url = _cfg->owmURL();
+    url += "weather";
+    url += "?q=" + _cfg->owmPlace();
+    url += "&unit=metric";
+    url += "&appid=" + _cfg->owmToken();
+
+    qDebug() << "weather" << url;
+
+    netMgr->get(QNetworkRequest(QUrl(url)));
+    connect(netMgr, &QNetworkAccessManager::finished, this, &Weather::nowRead);
+}
+
+void Weather::nowRead(QNetworkReply *s)
+{
+    bool update = false;
+
+    char const *m = s->readAll();
+    QJsonDocument itemDoc = QJsonDocument::fromJson(m);
     QJsonObject obj = itemDoc.object();
+    QMap<QString, QVariant> main = obj.value("main").toObject().toVariantMap();
 
-    QJsonValue lfTemp = obj.value("list").toArray()[0].toObject()["temp"];
-    double temp = lfTemp.toObject().value("day").toDouble();
-
-    if (_temp != temp)
+    QMap<QString, QVariant> weather = obj.value("weather").toArray()[0].toObject().toVariantMap();
+    QString icon = weather.value("icon").toString();
+    if (!icon.isEmpty() && !icon.isNull())
     {
-        _temp = temp;
-        flag = true;
+        _data["now"].icon =  "images/icons/" + icon + ".svg";
+        update = true;
+    } else {
+        _data["now"].icon = NOICON;
     }
 
-    QJsonValue lfIcon = obj.value("list").toArray()[0].toObject().value("weather").toArray()[0];
-    QString icon = lfIcon.toObject().value("icon").toString();
-    if ((icon != _icon) && (icon != ""))
-    {
-        _icon = icon;
-        flag = true;
+    bool ok = false;
+    double d = main["temp"].toDouble(&ok) * 100;
+    if (ok) {
+        _data["now"].temp = static_cast<int>(d);
+        _temp = static_cast<int>(d);
+        update = true;
+    } else {
+        _data["now"].temp = NOTEMP;
     }
 
-    if (flag)
-        emit weatherChanged();
+    d = main["temp_max"].toDouble(&ok) * 100;
+    if (ok) {
+        _data["now"].temp_max = static_cast<int>(d);
+        update = true;
+    } else {
+        _data["now"].temp = NOTEMP;
+    }
+
+    d = main["temp_min"].toDouble(&ok) * 100;
+    if (ok) {
+        _data["now"].temp_min = static_cast<int>(d);
+        update = true;
+    } else {
+        _data["now"].temp = NOTEMP;
+    }
+
+    d = main["pressure"].toDouble(&ok) * 100;
+    if (ok) {
+        _data["now"].pressure = static_cast<int>(d);
+        update = true;
+    } else {
+        _data["now"].temp = NOPRESSURE;
+    }
+
+    d = main["humidity"].toDouble(&ok) * 100;
+    if (ok) {
+        _data["now"].humidity = static_cast<int>(d);
+        update = true;
+    } else {
+        _data["now"].temp = NOHUMIDITY;
+    }
+
+    qDebug() << _temp << update;
+
+    if (update)
+        emit weatherNowChanged();
 }

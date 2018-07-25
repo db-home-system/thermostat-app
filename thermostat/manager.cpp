@@ -22,17 +22,10 @@ Manager *Manager::instance(QObject *parent)
     return manager_instance;
 }
 
-
-QString Manager::icon() const
+QVariantList Manager::weatherData() const
 {
-    return weather->getWIcon();
+    return weather->data();
 }
-
-QString Manager::tempo() const
-{
-    return QString::number(weather->getTemp());
-}
-
 
 QString Manager::displayClock() const
 {
@@ -138,7 +131,7 @@ Manager::Manager(QObject *parent) : QObject(parent),
                     this, &Manager::internalThermoStatus);
 
     // Weather info signals
-    connect(weather, &Weather::weatherChanged, this, &Manager::weatherInfo);
+    connect(weather, &Weather::weatherNowChanged, this, &Manager::weatherInfo);
 
     _cfg = AppConfig::instance();
 }

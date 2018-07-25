@@ -15,16 +15,15 @@ Item {
         property string extTemperature: Manager.extTemperature
         property string thermostatStatus: Manager.thermostatStatus
         property string displayClock: Manager.displayClock
-        property string tempo: Manager.tempo
-        property string icon: Manager.icon
+        property var    weatherData: Manager.weatherData
     }
 
-//    Image{
-//        source: "file://Users/asterix/Desktop/shot.jpg"
-//        anchors.top: parent.Center
-//        width: 480; height: 272
-//        fillMode: Image.PreserveAspectFit
-//    }
+    //    Image{
+    //        source: "file://Users/asterix/Desktop/shot.jpg"
+    //        anchors.top: parent.Center
+    //        width: 480; height: 272
+    //        fillMode: Image.PreserveAspectFit
+    //    }
 
     Timeline {
         id: timeline
@@ -68,27 +67,34 @@ Item {
         text: manager.thermostatStatus
     }
 
-    Image {
-        id: weatherIcon
-        x: 412
-        y: 8
-        source: "images/icons/" + manager.icon + ".svg"
-        width: 50; height:50
-        fillMode: Image.PreserveAspectFit
-    }
-
-    Text {
+    Item {
         id: weatherInfo
-        width: 100
-        color: "#8d8d8d"
-        text: manager.tempo + "°"
-        font.pointSize: 9
-        fontSizeMode: Text.Fit
-        anchors.verticalCenterOffset: -63
-        anchors.horizontalCenterOffset: 197
+        anchors.verticalCenterOffset: - (parent.height / 2)
+        anchors.horizontalCenterOffset: (parent.width / 2) - 85
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
-        verticalAlignment: Text.AlignVCenter
-        horizontalAlignment: Text.AlignHCenter
+        Column {
+            spacing: 2
+            Repeater {
+                model: manager.weatherData
+                onModelChanged: console.log(model)
+                Rectangle {
+                    width: 85
+                    height: 75
+                    Text {
+                        anchors.top: parent.top
+                        font.pointSize: 10
+                        text: modelData.temp_min + "°C / " + modelData.temp_max + "°C"
+                    }
+                    Image {
+                        anchors.bottom: parent.bottom
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        source: modelData.icon
+                        width: 60; height:60
+                        fillMode: Image.PreserveAspectFit
+                    }
+                }
+            }
+        }
     }
 }

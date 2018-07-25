@@ -51,6 +51,24 @@ QString AppConfig::getSimTimeClock()
     return ll;
 }
 
+QString AppConfig::owmToken()
+{
+    QString s = _cfg->value("owm_token", "").toString();
+    return s;
+}
+
+QString AppConfig::owmURL()
+{
+    QString s = _cfg->value("owm_url", "").toString();
+    return s;
+}
+
+QString AppConfig::owmPlace()
+{
+    QString s = _cfg->value("owm_place", "").toString();
+    return s;
+}
+
 int AppConfig::simTick()
 {
     int s = _cfg->value("sim_tick", 1000).toInt();
@@ -64,8 +82,8 @@ int AppConfig::simPIDTick()
 
 QString AppConfig::timelineFile()
 {
-    QByteArray s = _cfg->value("timeline_file", DEFAULT_TIMELINE).toByteArray();
-    QString p = QDir(_root_setting_path).filePath(QString::fromLocal8Bit(s));
+    QString s = _cfg->value("timeline_file", DEFAULT_TIMELINE).toString();
+    QString p = QDir(_root_setting_path).filePath(s); //QString::fromLocal8Bit(s));
     return p;
 }
 
