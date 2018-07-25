@@ -20,6 +20,7 @@ public:
     int pressure;
     int humidity;
     QString icon;
+    QString desc;
 
     Q_PROPERTY(int temp MEMBER temp)
     Q_PROPERTY(int temp_max MEMBER temp_max)
@@ -27,6 +28,7 @@ public:
     Q_PROPERTY(int pressure MEMBER pressure)
     Q_PROPERTY(int humidity MEMBER humidity)
     Q_PROPERTY(QString icon MEMBER icon)
+    Q_PROPERTY(QString desc MEMBER desc)
 };
 
 Q_DECLARE_METATYPE(WeatherData)

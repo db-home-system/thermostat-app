@@ -12,9 +12,9 @@ Weather::Weather(QObject *parent) : QObject(parent),
 {
     _cfg = AppConfig::instance();
 
-    _data["now"] =     { NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON };
-    _data["next6h"] =  { NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON };
-    _data["next12h"] = { NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON };
+    _data["now"] =     { NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON , "Now"};
+    _data["next6h"] =  { NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON , "6h"};
+    _data["next12h"] = { NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON , "12h"};
 
     _temp = NOTEMP;
 
@@ -92,7 +92,7 @@ void Weather::nowRead(QNetworkReply *s)
         _data["now"].temp_max = static_cast<int>(d);
         update = true;
     } else {
-        _data["now"].temp = NOTEMP;
+        _data["now"].temp_max = NOTEMP;
     }
 
     d = main["temp_min"].toDouble(&ok) * 100;
@@ -100,7 +100,7 @@ void Weather::nowRead(QNetworkReply *s)
         _data["now"].temp_min = static_cast<int>(d);
         update = true;
     } else {
-        _data["now"].temp = NOTEMP;
+        _data["now"].temp_min = NOTEMP;
     }
 
     d = main["pressure"].toDouble(&ok) * 100;
@@ -108,7 +108,7 @@ void Weather::nowRead(QNetworkReply *s)
         _data["now"].pressure = static_cast<int>(d);
         update = true;
     } else {
-        _data["now"].temp = NOPRESSURE;
+        _data["now"].pressure = NOPRESSURE;
     }
 
     d = main["humidity"].toDouble(&ok) * 100;
@@ -116,9 +116,10 @@ void Weather::nowRead(QNetworkReply *s)
         _data["now"].humidity = static_cast<int>(d);
         update = true;
     } else {
-        _data["now"].temp = NOHUMIDITY;
+        _data["now"].humidity = NOHUMIDITY;
     }
 
+    _data["now"].desc = "Now";
     qDebug() << _temp << update;
 
     if (update)
