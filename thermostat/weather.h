@@ -39,7 +39,7 @@ class Weather : public QObject
 public:
     explicit Weather(QObject *parent = nullptr);
 
-    double temp()   { return _temp;     }
+    int extTemp()   { return _temp;     }
     QVariantList data();
 
 private:

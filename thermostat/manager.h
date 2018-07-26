@@ -28,8 +28,8 @@ class Manager : public QObject
     Q_OBJECT
 
     // Thermostat property
-    Q_PROPERTY(QString intTemperature READ intTemperature NOTIFY intTemperatureChanged)
-    Q_PROPERTY(QString extTemperature READ extTemperature NOTIFY extTemperatureChanged)
+    Q_PROPERTY(int intTemperature READ intTemperature NOTIFY intTemperatureChanged)
+    Q_PROPERTY(int extTemperature READ extTemperature NOTIFY extTemperatureChanged)
     Q_PROPERTY(QString thermostatStatus READ thermostatStatus NOTIFY thermostatStatusChanged)
 
     // Time property
@@ -58,8 +58,8 @@ public:
     static Manager *instance(QObject *parent = nullptr);
 
     // Thermostat property
-    QString intTemperature() const;
-    QString extTemperature() const;
+    int intTemperature() const;
+    int extTemperature() const;
     QString thermostatStatus() const;
 
     QString displayClock() const;

@@ -32,27 +32,20 @@ QString Manager::displayClock() const
     return _diplay_clock;
 }
 
-QString Manager::intTemperature() const
+int Manager::intTemperature() const
 {
-    QString temp = "No Temp";
-    if (thermostat->intTemp() != NOTEMP)
-    {
-        temp = QString::number(thermostat->intTemp() / 1000);
-        temp += ",";
-        temp += QString::number((thermostat->intTemp()/100) % 10);
-    }
-    return temp;
+    return thermostat->intTemp();
 }
 
-QString Manager::extTemperature() const
+int Manager::extTemperature() const
 {
-    QString temp = "No Temp";
+    int temp = NOTEMP;
     if (thermostat->extTemp() != NOTEMP)
-    {
-        temp = QString::number(thermostat->extTemp() / 1000);
-        temp += ",";
-        temp += QString::number((thermostat->extTemp() / 10) % 100);
-    }
+        return thermostat->extTemp();
+
+    if (weather->extTemp() != NOTEMP)
+        return weather->extTemp();
+
     return temp;
 }
 

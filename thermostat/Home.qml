@@ -11,8 +11,8 @@ Item {
 
     QtObject {
         id: manager
-        property string intTemperature: Manager.intTemperature
-        property string extTemperature: Manager.extTemperature
+        property int intTemperature: Manager.intTemperature
+        property int extTemperature: Manager.extTemperature
         property string thermostatStatus: Manager.thermostatStatus
         property string displayClock: Manager.displayClock
         property var    weatherData: Manager.weatherData
@@ -36,13 +36,30 @@ Item {
         anchors.centerIn: parent
         font.pointSize: 24
         anchors.verticalCenterOffset: -32
-        text : "<b>" + manager.intTemperature + "</b>"
+        text : {
+            var i = "-"
+            if (manager.intTemperature !== -273000) {
+                var n = manager.intTemperature / 1000;
+                i = String(n.toFixed(1)) + "°C"
+                i = i.replace(".", ",")
+            }
+            return "<b>" + i + "</b>"
+        }
     }
 
     Text {
         anchors.centerIn: parent
         font.pointSize: 22
-        text : manager.extTemperature
+        text : {
+            var ext = "-"
+            if (manager.extTemperature !== -273000) {
+                var n = manager.extTemperature / 1000;
+                ext = String(n.toFixed(1)) + "°C"
+                ext = ext.replace(".", ",")
+            }
+            return ext;
+        }
+
         MouseArea {
             anchors.fill: parent
             onClicked: root.showSettings()
@@ -109,13 +126,13 @@ Item {
                             var min = "-"
                             if (modelData.temp_min !== -273000) {
                                 var m = modelData.temp_min / 1000;
-                                min = m.toFixed(1) + "°C"
+                                min = String(m.toFixed(1)) + "°C"
                                 min = min.replace(".", ",")
                             }
                             var max = "-"
                             if (modelData.temp_max !== -273000) {
                                 var n = modelData.temp_max / 1000;
-                                max = n.toFixed(1) + "°C"
+                                max = String(n.toFixed(1)) + "°C"
                                 max = max.replace(".", ",")
                             }
 
