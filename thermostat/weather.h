@@ -39,21 +39,30 @@ class Weather : public QObject
 public:
     explicit Weather(QObject *parent = nullptr);
 
-    int extTemp()   { return _temp;     }
+    int extTemp()   { return _data["now"].temp;  }
     QVariantList data();
 
 private:
     int _temp;
 
-    QNetworkAccessManager *const netMgr;
+    QNetworkAccessManager *const netNowMgr;
+    QNetworkAccessManager *const netForecastMgr;
+
+    bool convertWeatherIcon(QString key, QMap<QString, QVariant> buff);
+    bool convertWeatherData(QString key, QString desc, QMap<QString, QVariant> buff);
+
     void nowRead(QNetworkReply *s);
     void nowQuery();
+
+    void forecastRead(QNetworkReply *s);
+    void forecastQuery();
 
     AppConfig *_cfg;
     QMap<QString, WeatherData> _data;
 
 signals:
     void weatherNowChanged();
+    void weatherForecastChanged();
 };
 
 #endif // WEATHER_H

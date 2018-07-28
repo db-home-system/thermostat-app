@@ -125,6 +125,7 @@ Manager::Manager(QObject *parent) : QObject(parent),
 
     // Weather info signals
     connect(weather, &Weather::weatherNowChanged, this, &Manager::weatherInfo);
+    connect(weather, &Weather::weatherForecastChanged, this, &Manager::weatherInfo);
 
     _cfg = AppConfig::instance();
 }
