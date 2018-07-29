@@ -79,20 +79,20 @@ Item {
 
     Item {
         id: weatherInfo
-        anchors.verticalCenterOffset: - (parent.height / 2)
+        anchors.verticalCenterOffset: - (parent.height / 2) + 2
         anchors.horizontalCenterOffset: (parent.width / 2) - 85
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         Column {
-            spacing: 2
+            spacing: 1
             Repeater {
                 model: manager.weatherData
                 Rectangle {
                     width: 85
-                    height: 90
-                    color: "#cef2ff"
-                    radius: 3
-
+                    height: 89
+                    radius: 4
+                    border.color: "black"
+                    border.width: 1
                     Text {
                         id: label
                         anchors.top: parent.top
