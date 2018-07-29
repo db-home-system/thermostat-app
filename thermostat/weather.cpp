@@ -16,11 +16,9 @@ Weather::Weather(QObject *parent) : QObject(parent),
 {
     _cfg = AppConfig::instance();
 
-    _data["now"] =     { NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON , "Now"};
-    _data["next6h"] =  { NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON , "6h"};
-    _data["next12h"] = { NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON , "12h"};
-
-    _temp = NOTEMP;
+    _data.append(WeatherData{ NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON , "Now"});
+    _data.append(WeatherData{ NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON , "Next 6h"});
+    _data.append(WeatherData{ NOTEMP, NOTEMP, NOTEMP, NOPRESSURE, NOHUMIDITY, NOICON , "Next 12h"});
 
     connect(_timerNowQuery, &QTimer::timeout, this, &Weather::nowQuery);
     connect(_timerForecastQuery, &QTimer::timeout, this, &Weather::forecastQuery);
@@ -36,14 +34,14 @@ QVariantList Weather::data()
 {
     QVariantList d;
 
-    d.append(QVariant::fromValue(_data["now"]));
-    d.append(QVariant::fromValue(_data["next6h"]));
-    d.append(QVariant::fromValue(_data["next12h"]));
+    d.append(QVariant::fromValue(_data[WEATHER_NOW]));
+    d.append(QVariant::fromValue(_data[WEATHER_NEXT1]));
+    d.append(QVariant::fromValue(_data[WEATHER_NEXT2]));
 
     return d;
 }
 
-bool Weather::convertWeatherIcon(QString key, QMap<QString, QVariant> buff)
+bool Weather::convertWeatherIcon(WeatherDataEnum key, QMap<QString, QVariant> buff)
 {
     bool update = false;
     if (buff.empty())
@@ -61,7 +59,7 @@ bool Weather::convertWeatherIcon(QString key, QMap<QString, QVariant> buff)
     return update;
 }
 
-bool Weather::convertWeatherData(QString key, QString desc, QMap<QString, QVariant> buff)
+bool Weather::convertWeatherData(WeatherDataEnum key, QString desc, QMap<QString, QVariant> buff)
 {
     bool update = false;
     bool ok = false;
@@ -151,8 +149,8 @@ void Weather::nowRead(QNetworkReply *s)
 
     QDateTime clock = QDateTime::currentDateTime();
     QString desc = clock.toString("Now dd/MM");
-    bool flag = convertWeatherIcon("now", main.value("weather").toJsonArray().at(0).toObject().toVariantMap());
-    if (convertWeatherData("now", desc, main.value("main").toMap()) || flag)
+    bool flag = convertWeatherIcon(WEATHER_NOW, main.value("weather").toJsonArray().at(0).toObject().toVariantMap());
+    if (convertWeatherData(WEATHER_NEXT1, desc, main.value("main").toMap()) || flag)
         emit weatherNowChanged();
 }
 
@@ -192,17 +190,14 @@ void Weather::forecastRead(QNetworkReply *s)
     int index = 0;
     QJsonArray l = obj.value("list").toArray();
     if (l.isEmpty())
-    {
-        qDebug() << "Forecast empty reply..";
         return;
-    }
 
-    QVector<QString> forecast({"next6h", "next12h"});
+    QVector<WeatherDataEnum> forecast({WEATHER_NEXT1, WEATHER_NEXT2});
     for (auto i: forecast)
     {
         QDateTime clock = QDateTime::currentDateTime();
         int offset = 2;
-        if (i == "next12h")
+        if (i == WEATHER_NEXT2)
             offset = 8;
         QString desc = clock.addSecs(offset * 3 * 3600).toString("hh:00 dd/MM");
 

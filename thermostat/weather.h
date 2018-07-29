@@ -4,6 +4,7 @@
 #include "appconfig.h"
 
 #include <QObject>
+#include <QVector>
 
 class QTimer;
 class QTime;
@@ -33,13 +34,19 @@ public:
 
 Q_DECLARE_METATYPE(WeatherData)
 
+enum WeatherDataEnum {
+     WEATHER_NOW,
+     WEATHER_NEXT1,
+     WEATHER_NEXT2,
+};
+
 class Weather : public QObject
 {
     Q_OBJECT
 public:
     explicit Weather(QObject *parent = nullptr);
 
-    int extTemp()   { return _data["now"].temp;  }
+    int extTemp()   { return _data[WEATHER_NOW].temp;  }
     QVariantList data();
 
 private:
@@ -51,8 +58,8 @@ private:
     QTimer * const _timerNowQuery;
     QTimer * const _timerForecastQuery;
 
-    bool convertWeatherIcon(QString key, QMap<QString, QVariant> buff);
-    bool convertWeatherData(QString key, QString desc, QMap<QString, QVariant> buff);
+    bool convertWeatherIcon(WeatherDataEnum key, QMap<QString, QVariant> buff);
+    bool convertWeatherData(WeatherDataEnum key, QString desc, QMap<QString, QVariant> buff);
 
     void nowRead(QNetworkReply *s);
     void nowQuery();
@@ -61,7 +68,7 @@ private:
     void forecastQuery();
 
     AppConfig *_cfg;
-    QMap<QString, WeatherData> _data;
+    QVector<WeatherData> _data;
 
 signals:
     void weatherNowChanged();
