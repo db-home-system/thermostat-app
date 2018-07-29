@@ -25,9 +25,9 @@ Weather::Weather(QObject *parent) : QObject(parent),
 
     _timerNowQuery->setInterval(100);
     _timerNowQuery->start();
-    _timerForecastQuery->setInterval(300);
-    _timerForecastQuery->start();
 
+    _timerForecastQuery->setInterval(1000);
+    _timerForecastQuery->start();
 }
 
 QVariantList Weather::data()
@@ -131,12 +131,13 @@ void Weather::nowQuery()
     url += "&unit=metric";
     url += "&appid=" + _cfg->owmToken();
 
-    qDebug() << "weather" << url;
+//    qDebug() << "weather" << url;
 
     netNowMgr->get(QNetworkRequest(QUrl(url)));
     connect(netNowMgr, &QNetworkAccessManager::finished, this, &Weather::nowRead);
 
     _timerNowQuery->setInterval(DEFAULT_WEATHER_POLL_TIME);
+
 }
 
 void Weather::nowRead(QNetworkReply *s)
@@ -149,8 +150,9 @@ void Weather::nowRead(QNetworkReply *s)
 
     QDateTime clock = QDateTime::currentDateTime();
     QString desc = clock.toString("Now dd/MM");
+
     bool flag = convertWeatherIcon(WEATHER_NOW, main.value("weather").toJsonArray().at(0).toObject().toVariantMap());
-    if (convertWeatherData(WEATHER_NEXT1, desc, main.value("main").toMap()) || flag)
+    if (convertWeatherData(WEATHER_NOW, desc, main.value("main").toMap()) || flag)
         emit weatherNowChanged();
 }
 
@@ -171,7 +173,7 @@ void Weather::forecastQuery()
     url += "&unit=metric";
     url += "&appid=" + _cfg->owmToken();
 
-    qDebug() << "forecast" << url;
+//    qDebug() << "forecast" << url;
 
     netForecastMgr->get(QNetworkRequest(QUrl(url)));
     connect(netForecastMgr, &QNetworkAccessManager::finished, this, &Weather::forecastRead);

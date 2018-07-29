@@ -35,9 +35,9 @@ public:
 Q_DECLARE_METATYPE(WeatherData)
 
 enum WeatherDataEnum {
-     WEATHER_NOW,
-     WEATHER_NEXT1,
-     WEATHER_NEXT2,
+    WEATHER_NOW,
+    WEATHER_NEXT1,
+    WEATHER_NEXT2,
 };
 
 class Weather : public QObject
@@ -50,8 +50,6 @@ public:
     QVariantList data();
 
 private:
-    int _temp;
-
     QNetworkAccessManager *const netNowMgr;
     QNetworkAccessManager *const netForecastMgr;
 
