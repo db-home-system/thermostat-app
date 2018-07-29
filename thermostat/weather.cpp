@@ -10,7 +10,9 @@
 
 Weather::Weather(QObject *parent) : QObject(parent),
     netNowMgr(new QNetworkAccessManager(this)),
-    netForecastMgr(new QNetworkAccessManager(this))
+    netForecastMgr(new QNetworkAccessManager(this)),
+    _timerNowQuery(new QTimer(this)),
+    _timerForecastQuery(new QTimer(this))
 {
     _cfg = AppConfig::instance();
 
@@ -20,17 +22,13 @@ Weather::Weather(QObject *parent) : QObject(parent),
 
     _temp = NOTEMP;
 
-    QTimer *timerNowQuery = new QTimer(this);
-    connect(timerNowQuery, &QTimer::timeout, this, &Weather::nowQuery);
+    connect(_timerNowQuery, &QTimer::timeout, this, &Weather::nowQuery);
+    connect(_timerForecastQuery, &QTimer::timeout, this, &Weather::forecastQuery);
 
-    QTimer *timerForecastQuery = new QTimer(this);
-    connect(timerForecastQuery, &QTimer::timeout, this, &Weather::forecastQuery);
-
-    timerNowQuery->setInterval(10000);
-    timerNowQuery->start();
-
-    timerForecastQuery->setInterval(5000);
-    timerForecastQuery->start();
+    _timerNowQuery->setInterval(100);
+    _timerNowQuery->start();
+    _timerForecastQuery->setInterval(300);
+    _timerForecastQuery->start();
 
 }
 
@@ -49,10 +47,7 @@ bool Weather::convertWeatherIcon(QString key, QMap<QString, QVariant> buff)
 {
     bool update = false;
     if (buff.empty())
-    {
-        qDebug() << "Empty ICONS" << buff;
         return update;
-    }
 
     QString icon = buff.value("icon").toString();
     if (!icon.isEmpty() && !icon.isNull())
@@ -142,6 +137,8 @@ void Weather::nowQuery()
 
     netNowMgr->get(QNetworkRequest(QUrl(url)));
     connect(netNowMgr, &QNetworkAccessManager::finished, this, &Weather::nowRead);
+
+    _timerNowQuery->setInterval(DEFAULT_WEATHER_POLL_TIME);
 }
 
 void Weather::nowRead(QNetworkReply *s)
@@ -180,6 +177,8 @@ void Weather::forecastQuery()
 
     netForecastMgr->get(QNetworkRequest(QUrl(url)));
     connect(netForecastMgr, &QNetworkAccessManager::finished, this, &Weather::forecastRead);
+
+    _timerForecastQuery->setInterval(DEFAULT_FORECAST_POLL_TIME);
 }
 
 void Weather::forecastRead(QNetworkReply *s)
@@ -220,8 +219,5 @@ void Weather::forecastRead(QNetworkReply *s)
     }
 
     if (update)
-    {
-        qDebug() << "forecatChanged";
         emit weatherForecastChanged();
-    }
 }

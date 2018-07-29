@@ -48,6 +48,9 @@ private:
     QNetworkAccessManager *const netNowMgr;
     QNetworkAccessManager *const netForecastMgr;
 
+    QTimer * const _timerNowQuery;
+    QTimer * const _timerForecastQuery;
+
     bool convertWeatherIcon(QString key, QMap<QString, QVariant> buff);
     bool convertWeatherData(QString key, QString desc, QMap<QString, QVariant> buff);
 

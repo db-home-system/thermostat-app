@@ -12,8 +12,11 @@
 #define NOICON                    "images/icons/00d.svg"
 #define DEFAULT_TIMELINE_LOWTEMP  10000        // mdegCelsius
 
-#define DEFAULT_PID_TICK     1000 // millisecons
-#define DEFAULT_CLOCK_TICK   1000 // millisecons
+#define DEFAULT_PID_TICK     1000 // milliseconds
+#define DEFAULT_CLOCK_TICK   1000 // milliseconds
+
+#define DEFAULT_FORECAST_POLL_TIME  5  * 60 * 1000 // milliseconds
+#define DEFAULT_WEATHER_POLL_TIME   10 * 60 * 1000 // milliseconds
 
 class QSettings;
 
