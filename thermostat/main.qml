@@ -20,25 +20,38 @@ Window {
             }
         }
 
-        Image{
-            source: "images/logo.png"
+        Item {
+            id: mainLogo
             anchors.top: parent.top
-            width: 80; height: 80
-            fillMode: Image.PreserveAspectFit
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    stack.clear()
-                    stack.push(homePage)
+            anchors.left: parent.left
+            anchors.topMargin: 1
+            anchors.leftMargin: 1
+            width: 85
+            height: 89
+            Rectangle {
+                id: mainLogoElement
+                anchors.fill: mainLogo
+                radius: 4
+                border.color: "black"
+                border.width: 1
+                Image{
+                    source: "images/logo.png"
+                    fillMode: Image.PreserveAspectFit
+                    anchors.fill: parent
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            stack.clear()
+                            stack.push(homePage)
+                        }
+                    }
                 }
             }
         }
-
     }
 
     Component {
         id: myComponents
-
         Settings {
             onGoBack: stack.pop()
         }

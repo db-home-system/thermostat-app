@@ -5,8 +5,6 @@ import ThermostatApp 1.0
 Item {
     id: root
 
-    property color coloreDiSfondo
-
     signal showSettings()
 
     QtObject {
@@ -18,76 +16,159 @@ Item {
         property var    weatherData: Manager.weatherData
     }
 
-    Timeline {
-        id: timeline
-        anchors.centerIn: parent
-        width: 270
-        height: 270
-    }
-
-    Text {
-        anchors.centerIn: parent
-        font.pointSize: 24
-        anchors.verticalCenterOffset: -32
-        text : {
-            var i = "-"
-            if (manager.intTemperature !== -273000) {
-                var n = manager.intTemperature / 1000;
-                i = String(n.toFixed(1)) + "°"
-                i = i.replace(".", ",")
-            }
-            return "<b>" + i + "</b>"
-        }
-    }
-
-    Text {
-        anchors.centerIn: parent
-        font.pointSize: 22
-        text : {
-            var ext = "-"
-            if (manager.extTemperature !== -273000) {
-                var n = manager.extTemperature / 1000;
-                ext = String(n.toFixed(1)) + "°"
-                ext = ext.replace(".", ",")
-            }
-            return ext;
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: root.showSettings()
-        }
-    }
-
-    Text {
+    /*  Clock and time Info block */
+    Item {
         id: clock
-        anchors.centerIn: parent
-        font.pointSize: 17
-        text: manager.displayClock
-        anchors.verticalCenterOffset: 32
-        color: "#364922"
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.topMargin: 91
+        anchors.leftMargin: 1
+        width: 85
+        height: 89
+        Rectangle {
+            id: clockElemnt
+            anchors.fill: clock
+            radius: 4
+            border.color: "black"
+            border.width: 1
+            Text {
+                id: dayName
+                anchors.top: parent.top
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pointSize: 16
+                text: "Lunedi, 30"
+                color: "#364922"
+            }
+            Text {
+                id: dateStr
+                anchors.top: dayName.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pointSize: 16
+                text: "Luglio"
+                color: "#364922"
+            }
+            Text {
+                id: clockStr
+                anchors.top: dateStr.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pointSize: 16
+                text: manager.displayClock
+                color: "#364922"
+            }
+            Text {
+                id: yearStr
+                anchors.top: clockStr.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pointSize: 16
+                text: "2018"
+                color: "#364922"
+            }
+        }
     }
 
-    Text {
-        id: thermostat
+    /* Mode block and commands */
+    Item {
+        id: mode
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.topMargin: 182
+        anchors.leftMargin: 1
+        width: 85
+        height: 89
+        Rectangle {
+            id: modeElemnt
+            anchors.fill: parent
+            radius: 4
+            border.color: "black"
+            border.width: 1
+            Text {
+                anchors.centerIn: parent
+                font.pointSize: 17
+                text: "Mode"
+                color: "#364922"
+            }
+        }
+    }
+
+
+
+    /*  TimeLine block */
+    Item {
+        id: timeLine
         anchors.centerIn: parent
-        font.pointSize: 17
-        anchors.verticalCenterOffset: 64
-        anchors.horizontalCenterOffset: 0
-        text: manager.thermostatStatus
+        width: 305
+        height: 270
+        Rectangle {
+            id:timeLineBox
+            anchors.fill: parent
+            anchors.centerIn: timeLine
+            radius: 4
+            border.color: "black"
+            border.width: 1
+            Timeline {
+                id: timelineElement
+                anchors.centerIn: timeLineBox
+                width: 270
+                height: 270
+            }
+
+            Text {
+                anchors.centerIn: parent
+                font.pointSize: 24
+                anchors.verticalCenterOffset: -32
+                text : {
+                    var i = "-"
+                    if (manager.intTemperature !== -273000) {
+                        var n = manager.intTemperature / 1000;
+                        i = String(n.toFixed(1)) + "°"
+                        i = i.replace(".", ",")
+                    }
+                    return "<b>" + i + "</b>"
+                }
+            }
+            Text {
+                anchors.centerIn: parent
+                font.pointSize: 22
+                text : {
+                    var ext = "-"
+                    if (manager.extTemperature !== -273000) {
+                        var n = manager.extTemperature / 1000;
+                        ext = String(n.toFixed(1)) + "°"
+                        ext = ext.replace(".", ",")
+                    }
+                    return ext;
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: root.showSettings()
+                }
+            }
+
+            Text {
+                id: thermostat
+                anchors.centerIn: parent
+                font.pointSize: 17
+                anchors.verticalCenterOffset: 64
+                anchors.horizontalCenterOffset: 0
+                text: manager.thermostatStatus
+            }
+        }
     }
 
     Item {
         id: weatherInfo
-        anchors.verticalCenterOffset: - (parent.height / 2) + 2
-        anchors.horizontalCenterOffset: (parent.width / 2) - 85
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.topMargin: 1
+        anchors.rightMargin: 1
+        width: 85
         Column {
             spacing: 1
             Repeater {
                 model: manager.weatherData
                 Rectangle {
+                    id: weatherbox
                     width: 85
                     height: 89
                     radius: 4
