@@ -146,16 +146,12 @@ void Thermostat::dump(float sp)
 
 void Thermostat::pidControll()
 {
-    QMapIterator<int, SensMap> i(_sensors_data);
     int avg_ext = NOTEMP;
     int avg_int = NOTEMP;
     int c_ext = 0;
     int c_int = 0;
-    while (i.hasNext())
+    for (auto &m: _sensors_data)
     {
-        i.next();
-        SensMap m = i.value();
-
         if (m.data == NOTEMP)
             continue;
 
@@ -207,7 +203,7 @@ void Thermostat::pidControll()
     dump(sp);
     heaterOnOff(onoff);
 
-    int tick = 0;
+    int tick = DEFAULT_PID_TICK;
     if (_cfg->appMode() == AppConfig::TEST)
         tick = _cfg->simPIDTick();
 
